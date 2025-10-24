@@ -95,15 +95,14 @@ export const joinGameRoom = async (roomCode, playerName) => {
   const room = rooms[0];
   
   // Check if name is already taken by an active player
-  const { data: existingPlayer } = await supabase
+  const { data: existingPlayers } = await supabase
     .from('players')
     .select('id')
     .eq('room_code', roomCode.toUpperCase())
     .eq('player_name', playerName)
-    .eq('is_active', true)
-    .single();
+    .eq('is_active', true);
   
-  if (existingPlayer) {
+  if (existingPlayers && existingPlayers.length > 0) {
     throw new Error('Name already taken');
   }
   
