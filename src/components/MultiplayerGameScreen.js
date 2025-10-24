@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './GameScreen.css';
 import { 
   getPlayers, 
@@ -41,6 +41,8 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const [showingResults, setShowingResults] = useState(false);
   const [initialCountdown, setInitialCountdown] = useState(10); // 10 second countdown before Round 1
   const [gameStarted, setGameStarted] = useState(false);
+  const timerRef = useRef(null);
+  const currentRoundRef = useRef(null);
 
   const handleRoundEnd = useCallback(async () => {
     if (!isHost) return;
@@ -162,7 +164,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     }
   }, [gameState, initialCountdown, gameStarted]);
 
-  // Timer countdown
+  // Timer countdown - only restart when round actually changes
   useEffect(() => {
     if (!gameState || showingResults || countdown > 0 || !gameStarted) {
       console.log('Timer blocked:', { 
@@ -175,26 +177,48 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       return;
     }
 
-    console.log('🎮 Timer STARTED for round', gameState.round_number);
+    // Check if this is a new round
+    const isNewRound = currentRoundRef.current !== gameState.round_number;
+    
+    if (isNewRound) {
+      // Clear any existing timer
+      if (timerRef.current) {
+        console.log('🧹 Clearing old timer for round', currentRoundRef.current);
+        clearInterval(timerRef.current);
+      }
 
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        const newTime = prev - 0.1;
-        if (newTime <= 0) {
-          console.log('⏰ Timer EXPIRED for round', gameState.round_number);
-          clearInterval(timer);
-          handleRoundEnd();
-          return 0;
-        }
-        return newTime;
-      });
-    }, 100);
+      // Update current round
+      currentRoundRef.current = gameState.round_number;
+      
+      console.log('🎮 Timer STARTED for round', gameState.round_number);
+
+      // Start new timer
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          const newTime = prev - 0.1;
+          if (newTime <= 0) {
+            console.log('⏰ Timer EXPIRED for round', currentRoundRef.current);
+            if (timerRef.current) {
+              clearInterval(timerRef.current);
+              timerRef.current = null;
+            }
+            handleRoundEnd();
+            return 0;
+          }
+          return newTime;
+        });
+      }, 100);
+    }
 
     return () => {
-      console.log('🧹 Timer CLEANUP for round', gameState.round_number);
-      clearInterval(timer);
+      // Only cleanup on unmount, not on every re-render
+      if (timerRef.current) {
+        console.log('🧹 Component unmounting, cleaning up timer');
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, [gameState, showingResults, countdown, gameStarted, handleRoundEnd]);
+  }, [gameState?.round_number, showingResults, countdown, gameStarted, handleRoundEnd]);
 
   // Countdown between rounds
   useEffect(() => {
