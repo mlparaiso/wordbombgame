@@ -478,6 +478,151 @@ export const getTeamCapacity = async (roomCode) => {
 };
 
 /**
+ * Send a chat message
+ * @param {string} roomCode - The room code
+ * @param {string} playerId - The player ID (can be null for system messages)
+ * @param {string} playerName - The player name
+ * @param {string} message - The message text
+ * @param {boolean} isSystemMessage - Whether this is a system message
+ */
+export const sendChatMessage = async (roomCode, playerId, playerName, message, isSystemMessage = false) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  const { error } = await supabase
+    .from('chat_messages')
+    .insert({
+      room_code: roomCode.toUpperCase(),
+      player_id: playerId,
+      player_name: playerName,
+      message: message,
+      is_system_message: isSystemMessage
+    });
+  
+  if (error) throw error;
+};
+
+/**
+ * Get chat messages for a room
+ * @param {string} roomCode - The room code
+ * @param {number} limit - Maximum number of messages to retrieve
+ * @returns {Promise<Array>}
+ */
+export const getChatMessages = async (roomCode, limit = 50) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .eq('room_code', roomCode.toUpperCase())
+    .order('created_at', { ascending: true })
+    .limit(limit);
+  
+  if (error) throw error;
+  return data || [];
+};
+
+/**
+ * Subscribe to chat messages
+ * @param {string} roomCode - The room code
+ * @param {Function} callback - Callback function when new messages arrive
+ * @returns {Object} Subscription object
+ */
+export const subscribeToChatMessages = (roomCode, callback) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  return supabase
+    .channel(`chat:${roomCode}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'chat_messages',
+        filter: `room_code=eq.${roomCode.toUpperCase()}`
+      },
+      callback
+    )
+    .subscribe();
+};
+
+/**
+ * Pause the game
+ * @param {string} roomCode - The room code
+ * @param {number} timeRemaining - Seconds remaining when paused
+ */
+export const pauseGame = async (roomCode, timeRemaining) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  const { error } = await supabase
+    .from('game_rooms')
+    .update({
+      is_paused: true,
+      paused_at: new Date().toISOString(),
+      paused_time_remaining: Math.floor(timeRemaining)
+    })
+    .eq('room_code', roomCode.toUpperCase());
+  
+  if (error) throw error;
+};
+
+/**
+ * Resume the game
+ * @param {string} roomCode - The room code
+ */
+export const resumeGame = async (roomCode) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  const { error } = await supabase
+    .from('game_rooms')
+    .update({
+      is_paused: false,
+      paused_at: null
+    })
+    .eq('room_code', roomCode.toUpperCase());
+  
+  if (error) throw error;
+};
+
+/**
+ * Kick a player from the room
+ * @param {string} playerId - The player ID to kick
+ */
+export const kickPlayer = async (playerId) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  const { error } = await supabase
+    .from('players')
+    .update({ is_active: false })
+    .eq('id', playerId);
+  
+  if (error) throw error;
+};
+
+/**
+ * Subscribe to room changes (for pause/resume/settings)
+ * @param {string} roomCode - The room code
+ * @param {Function} callback - Callback function when room changes
+ * @returns {Object} Subscription object
+ */
+export const subscribeToRoom = (roomCode, callback) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  return supabase
+    .channel(`room:${roomCode}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'game_rooms',
+        filter: `room_code=eq.${roomCode.toUpperCase()}`
+      },
+      callback
+    )
+    .subscribe();
+};
+
+/**
  * Get team scores (aggregated from individual player scores)
  * @param {string} roomCode - The room code
  * @returns {Promise<Array>} - Array of team scores with team info
