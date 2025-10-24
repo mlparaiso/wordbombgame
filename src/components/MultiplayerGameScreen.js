@@ -218,6 +218,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
         timerRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState?.round_number, showingResults, countdown, gameStarted, handleRoundEnd]);
 
   // Countdown between rounds
