@@ -45,8 +45,8 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     // Load players immediately
     loadPlayers();
 
-    // Then poll every 2 seconds
-    const intervalId = setInterval(loadPlayers, 2000);
+    // Then poll every 250ms for near-instant updates
+    const intervalId = setInterval(loadPlayers, 250);
 
     return () => {
       clearInterval(intervalId);
@@ -80,8 +80,8 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     // Poll immediately
     pollRoomStatus();
 
-    // Then poll every 2 seconds
-    const intervalId = setInterval(pollRoomStatus, 2000);
+    // Then poll every 250ms for near-instant updates
+    const intervalId = setInterval(pollRoomStatus, 250);
 
     return () => {
       isActive = false;

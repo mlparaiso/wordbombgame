@@ -258,19 +258,331 @@
   animation: shake 0.3s ease-in-out;
 }
 
+/* Multiplayer Game Styles */
+.exit-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(99, 102, 241, 0.9);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 100;
+}
+
+.exit-btn:hover {
+  background: rgba(79, 70, 229, 1);
+  transform: translateX(-2px);
+}
+
+.game-header {
+  margin-bottom: 20px;
+}
+
+.round-info {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.combo-display {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.combo-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.combo-letters {
+  display: inline-block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #6366f1;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  padding: 20px 40px;
+  border-radius: 12px;
+  letter-spacing: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.word-input-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.word-input {
+  flex: 1;
+  padding: 14px 18px;
+  font-size: 1.1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.word-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.word-input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: #10b981;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+  min-width: 120px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+}
+
+.submit-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.message {
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.message.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Players Scoreboard */
+.players-scoreboard {
+  margin-top: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.players-scoreboard h3 {
+  color: #374151;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 10px;
+}
+
+.player-score-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.player-score-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.player-score-item.current-player {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 2px solid #3b82f6;
+  font-weight: 600;
+}
+
+.player-rank {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #6366f1;
+  min-width: 35px;
+}
+
+.player-name {
+  flex: 1;
+  font-size: 1rem;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.answered-badge {
+  display: inline-block;
+  background: #10b981;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.player-score {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #6366f1;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* Round Results */
+.round-results {
+  text-align: center;
+  padding: 20px;
+}
+
+.round-results h2 {
+  color: #374151;
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+}
+
+.countdown-display {
+  margin-bottom: 30px;
+}
+
+.countdown-display p {
+  color: #6b7280;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.countdown-number {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #6366f1;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.round-answers {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.round-answers h3 {
+  color: #374151;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.answer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.answer-word {
+  font-size: 1rem;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.answer-points {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #10b981;
+}
+
+.current-standings {
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.current-standings h3 {
+  color: #374151;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.standing-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.standing-item .rank {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #6366f1;
+  min-width: 35px;
+}
+
+.standing-item .player-name {
+  flex: 1;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.standing-item .player-score {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #6366f1;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .game-screen {
     padding-top: 45px;
   }
 
-  .home-btn {
-    top: -45px;
+  .home-btn, .exit-btn {
+    top: 5px;
+    left: 5px;
     padding: 6px 12px;
     font-size: 0.8rem;
   }
 
-  .letter-combo {
+  .letter-combo, .combo-letters {
     font-size: 1.8rem;
     padding: 12px 24px;
     letter-spacing: 4px;
@@ -292,17 +604,44 @@
     font-size: 1.1rem;
   }
 
-  .input-container input {
+  .input-container input, .word-input {
     font-size: 0.9rem;
     padding: 10px 12px;
   }
 
-  .input-container button {
+  .input-container button, .submit-btn {
     font-size: 0.85rem;
     padding: 10px 20px;
+    min-width: 100px;
   }
 
-  .feedback {
+  .feedback, .message {
     font-size: 0.85rem;
+  }
+
+  .players-scoreboard {
+    padding: 15px;
+  }
+
+  .player-score-item {
+    padding: 10px 12px;
+  }
+
+  .player-rank {
+    font-size: 1rem;
+    min-width: 30px;
+  }
+
+  .player-name {
+    font-size: 0.9rem;
+  }
+
+  .player-score {
+    font-size: 1.1rem;
+    min-width: 50px;
+  }
+
+  .countdown-number {
+    font-size: 3rem;
   }
 }
