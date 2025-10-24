@@ -15,7 +15,8 @@ const generateRoomCode = () => {
  * @param {number} maxRounds - Maximum number of rounds (default: 10)
  * @param {number} livesPerPlayer - Lives per player (default: 3)
  * @param {number} pointsPerWord - Points awarded per word (default: 50)
- * @returns {Promise<{roomCode: string, playerId: string}>}
+ * @param {boolean} isSpectator - Whether host joins as spectator (default: false)
+ * @returns {Promise<{roomCode: string, playerId: string, isSpectator: boolean}>}
  */
 export const createGameRoom = async (
   hostName,
@@ -23,7 +24,8 @@ export const createGameRoom = async (
   difficulty,
   maxRounds = 10,
   livesPerPlayer = 3,
-  pointsPerWord = 50
+  pointsPerWord = 50,
+  isSpectator = false
 ) => {
   if (!supabase) throw new Error('Supabase not configured');
   
@@ -54,13 +56,14 @@ export const createGameRoom = async (
       room_code: roomCode,
       player_name: hostName,
       is_host: true,
+      is_spectator: isSpectator,
       score: 0,
       lives: livesPerPlayer
     });
   
   if (playerError) throw playerError;
   
-  return { roomCode, playerId: hostId };
+  return { roomCode, playerId: hostId, isSpectator };
 };
 
 /**

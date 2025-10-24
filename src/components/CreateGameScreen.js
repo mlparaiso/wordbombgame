@@ -11,6 +11,7 @@ function CreateGameScreen({ onCreateGame, onBack }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isSpectator, setIsSpectator] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +36,8 @@ function CreateGameScreen({ onCreateGame, onBack }) {
         difficulty,
         maxRounds,
         livesPerPlayer,
-        pointsPerWord
+        pointsPerWord,
+        isSpectator
       );
     } catch (err) {
       setError(err.message || 'Failed to create game');
@@ -64,6 +66,17 @@ function CreateGameScreen({ onCreateGame, onBack }) {
               maxLength={20}
               autoFocus
             />
+          </div>
+
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={isSpectator}
+                onChange={(e) => setIsSpectator(e.target.checked)}
+              />
+              <span>Join as Spectator (watch only, don't play)</span>
+            </label>
           </div>
 
           <div className="form-group">
