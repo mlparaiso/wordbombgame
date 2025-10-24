@@ -32,9 +32,6 @@ function GameScreen({
   const handleSubmit = async () => {
     if (!inputValue.trim()) return;
     
-    // Show loading state
-    setFeedback({ message: 'Checking word...', type: '' });
-    
     const result = await onSubmitWord(inputValue);
     
     if (result.success) {
@@ -69,8 +66,8 @@ function GameScreen({
   return (
     <div className="game-screen">
       {onExit && (
-        <button className="exit-btn" onClick={handleExit}>
-          🏠 Exit
+        <button className="home-btn" onClick={handleExit}>
+          🏠 Home
         </button>
       )}
 

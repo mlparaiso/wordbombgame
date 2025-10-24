@@ -34,8 +34,8 @@ function CreateGameScreen({ onCreateGame, onBack }) {
 
   return (
     <div className="create-game-screen">
-      <button className="back-btn" onClick={onBack}>
-        ← Back
+      <button className="home-btn" onClick={onBack}>
+        🏠 Home
       </button>
 
       <div className="create-game-content">

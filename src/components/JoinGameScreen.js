@@ -49,8 +49,8 @@ function JoinGameScreen({ onJoinGame, onBack }) {
 
   return (
     <div className="join-game-screen">
-      <button className="back-btn" onClick={onBack}>
-        ← Back
+      <button className="home-btn" onClick={onBack}>
+        🏠 Home
       </button>
 
       <div className="join-game-content">

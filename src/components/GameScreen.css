@@ -1,27 +1,28 @@
 .game-screen {
   animation: fadeIn 0.5s ease-in;
   position: relative;
+  padding-top: 50px; /* Space for home button */
 }
 
-.exit-btn {
+.home-btn {
   position: absolute;
-  top: 0;
-  right: 0;
-  background: rgba(239, 68, 68, 0.9);
+  top: -50px;
+  left: 0;
+  background: rgba(99, 102, 241, 0.9);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  z-index: 10;
+  z-index: 100;
 }
 
-.exit-btn:hover {
-  background: rgba(220, 38, 38, 1);
-  transform: translateX(2px);
+.home-btn:hover {
+  background: rgba(79, 70, 229, 1);
+  transform: translateX(-2px);
 }
 
 @keyframes slideIn {
@@ -39,30 +40,30 @@
 .stats {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 25px;
-  gap: 15px;
+  margin-bottom: 15px;
+  gap: 10px;
 }
 
 .stat {
   flex: 1;
   text-align: center;
-  padding: 15px;
+  padding: 10px;
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .stat-label {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   color: #6b7280;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .stat-value {
   display: block;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: bold;
   color: #6366f1;
 }
@@ -70,10 +71,10 @@
 /* Timer */
 .timer-container {
   position: relative;
-  height: 60px;
+  height: 40px;
   background: #e5e7eb;
-  border-radius: 30px;
-  margin-bottom: 30px;
+  border-radius: 20px;
+  margin-bottom: 20px;
   overflow: hidden;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -84,7 +85,7 @@
   top: 0;
   height: 100%;
   background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
-  border-radius: 30px;
+  border-radius: 20px;
   transition: width 0.1s linear;
 }
 
@@ -93,7 +94,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   font-weight: bold;
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -103,25 +104,25 @@
 /* Prompt */
 .prompt-container {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 .prompt-label {
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: #6b7280;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .letter-combo {
   display: inline-block;
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #6366f1;
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  padding: 20px 40px;
-  border-radius: 15px;
-  letter-spacing: 8px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 15px 30px;
+  border-radius: 12px;
+  letter-spacing: 6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -137,16 +138,16 @@
 /* Input */
 .input-container {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 15px;
 }
 
 .input-container input {
   flex: 1;
-  padding: 15px 20px;
-  font-size: 1.2rem;
-  border: 3px solid #e5e7eb;
-  border-radius: 12px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
   outline: none;
   transition: all 0.3s ease;
 }
@@ -157,11 +158,11 @@
 }
 
 .input-container button {
-  padding: 15px 30px;
-  font-size: 1.1rem;
+  padding: 12px 24px;
+  font-size: 0.95rem;
   font-weight: 600;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #10b981;
   color: white;
   cursor: pointer;
@@ -180,11 +181,11 @@
 
 /* Feedback */
 .feedback {
-  min-height: 30px;
+  min-height: 25px;
   text-align: center;
   font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 20px;
+  font-size: 0.95rem;
+  margin-bottom: 15px;
   animation: fadeIn 0.3s ease-in;
 }
 
@@ -259,21 +260,49 @@
 
 /* Responsive */
 @media (max-width: 600px) {
+  .game-screen {
+    padding-top: 45px;
+  }
+
+  .home-btn {
+    top: -45px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
   .letter-combo {
-    font-size: 2.5rem;
-    padding: 15px 30px;
-    letter-spacing: 5px;
+    font-size: 1.8rem;
+    padding: 12px 24px;
+    letter-spacing: 4px;
   }
 
-  .stats {
-    flex-direction: column;
+  .stat-label {
+    font-size: 0.65rem;
   }
 
-  .input-container {
-    flex-direction: column;
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  .timer-container {
+    height: 35px;
+  }
+
+  .timer-text {
+    font-size: 1.1rem;
+  }
+
+  .input-container input {
+    font-size: 0.9rem;
+    padding: 10px 12px;
   }
 
   .input-container button {
-    width: 100%;
+    font-size: 0.85rem;
+    padding: 10px 20px;
+  }
+
+  .feedback {
+    font-size: 0.85rem;
   }
 }

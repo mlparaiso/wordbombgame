@@ -3,6 +3,27 @@
   position: relative;
 }
 
+.home-btn {
+  position: absolute;
+  top: -10px;
+  left: 0;
+  background: rgba(99, 102, 241, 0.9);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 100;
+}
+
+.home-btn:hover {
+  background: rgba(79, 70, 229, 1);
+  transform: translateX(-2px);
+}
+
 .join-game-content {
   text-align: center;
   padding-top: 20px;
