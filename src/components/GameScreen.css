@@ -2,9 +2,12 @@
   animation: fadeIn 0.5s ease-in;
   position: relative;
   padding-top: 50px; /* Space for home button */
-  min-height: 600px; /* Consistent minimum height */
+  min-height: 100vh; /* Full viewport height */
   max-width: 800px; /* Consistent maximum width */
   margin: 0 auto; /* Center the game screen */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .home-btn {

@@ -143,17 +143,21 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
 
   // Initial countdown before Round 1
   useEffect(() => {
-    if (!gameState || gameStarted || gameState.round_number !== 1) {
-      setGameStarted(true);
-      return;
-    }
-
-    if (initialCountdown > 0) {
-      const timer = setTimeout(() => {
-        setInitialCountdown(prev => prev - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else {
+    if (!gameState) return;
+    
+    // Only show countdown for Round 1
+    if (gameState.round_number === 1 && !gameStarted) {
+      if (initialCountdown > 0) {
+        const timer = setTimeout(() => {
+          setInitialCountdown(prev => prev - 1);
+        }, 1000);
+        return () => clearTimeout(timer);
+      } else {
+        // Countdown finished, start the game
+        setGameStarted(true);
+      }
+    } else if (gameState.round_number > 1) {
+      // For rounds after 1, game is already started
       setGameStarted(true);
     }
   }, [gameState, initialCountdown, gameStarted]);
