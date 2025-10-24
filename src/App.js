@@ -155,12 +155,22 @@ function App() {
   }, [difficulty, startGame]);
 
   // Multiplayer: Create game
-  const handleCreateGame = async (playerName, selectedGameMode, selectedDifficulty) => {
+  const handleCreateGame = async (
+    playerName,
+    selectedGameMode,
+    selectedDifficulty,
+    maxRounds = 10,
+    livesPerPlayer = 3,
+    pointsPerWord = 50
+  ) => {
     try {
       const { roomCode: newRoomCode, playerId: newPlayerId } = await createGameRoom(
         playerName,
         selectedGameMode,
-        selectedDifficulty
+        selectedDifficulty,
+        maxRounds,
+        livesPerPlayer,
+        pointsPerWord
       );
       
       setRoomCode(newRoomCode);

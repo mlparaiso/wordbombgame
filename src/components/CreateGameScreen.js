@@ -5,8 +5,12 @@ function CreateGameScreen({ onCreateGame, onBack }) {
   const [playerName, setPlayerName] = useState('');
   const [gameMode, setGameMode] = useState('vs_all');
   const [difficulty, setDifficulty] = useState('medium');
+  const [maxRounds, setMaxRounds] = useState(10);
+  const [livesPerPlayer, setLivesPerPlayer] = useState(3);
+  const [pointsPerWord, setPointsPerWord] = useState(50);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +29,14 @@ function CreateGameScreen({ onCreateGame, onBack }) {
     setError('');
 
     try {
-      await onCreateGame(playerName.trim(), gameMode, difficulty);
+      await onCreateGame(
+        playerName.trim(),
+        gameMode,
+        difficulty,
+        maxRounds,
+        livesPerPlayer,
+        pointsPerWord
+      );
     } catch (err) {
       setError(err.message || 'Failed to create game');
       setLoading(false);
@@ -126,6 +137,92 @@ function CreateGameScreen({ onCreateGame, onBack }) {
               </button>
             </div>
           </div>
+
+          <div className="form-group">
+            <label>Number of Rounds</label>
+            <div className="rounds-options">
+              <button
+                type="button"
+                className={`round-btn ${maxRounds === 5 ? 'active' : ''}`}
+                onClick={() => setMaxRounds(5)}
+              >
+                Quick (5)
+              </button>
+              <button
+                type="button"
+                className={`round-btn ${maxRounds === 10 ? 'active' : ''}`}
+                onClick={() => setMaxRounds(10)}
+              >
+                Standard (10)
+              </button>
+              <button
+                type="button"
+                className={`round-btn ${maxRounds === 15 ? 'active' : ''}`}
+                onClick={() => setMaxRounds(15)}
+              >
+                Long (15)
+              </button>
+              <button
+                type="button"
+                className={`round-btn ${maxRounds === 20 ? 'active' : ''}`}
+                onClick={() => setMaxRounds(20)}
+              >
+                Marathon (20)
+              </button>
+            </div>
+          </div>
+
+          <div className="advanced-toggle">
+            <button
+              type="button"
+              className="toggle-btn"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              {showAdvanced ? '▼' : '▶'} Advanced Settings
+            </button>
+          </div>
+
+          {showAdvanced && (
+            <div className="advanced-settings">
+              <div className="form-group">
+                <label>Lives per Player: {livesPerPlayer} ❤️</label>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={livesPerPlayer}
+                  onChange={(e) => setLivesPerPlayer(parseInt(e.target.value))}
+                  className="slider"
+                />
+                <div className="slider-labels">
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                  <span>5</span>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Points per Word: {pointsPerWord}</label>
+                <input
+                  type="range"
+                  min="25"
+                  max="100"
+                  step="25"
+                  value={pointsPerWord}
+                  onChange={(e) => setPointsPerWord(parseInt(e.target.value))}
+                  className="slider"
+                />
+                <div className="slider-labels">
+                  <span>25</span>
+                  <span>50</span>
+                  <span>75</span>
+                  <span>100</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {error && <div className="error-message">{error}</div>}
 

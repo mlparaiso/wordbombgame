@@ -12,15 +12,25 @@ const generateRoomCode = () => {
  * @param {string} hostName - Name of the host player
  * @param {string} gameMode - Game mode (solo, vs_all, team_2, team_3, team_4)
  * @param {string} difficulty - Difficulty level (easy, medium, hard)
+ * @param {number} maxRounds - Maximum number of rounds (default: 10)
+ * @param {number} livesPerPlayer - Lives per player (default: 3)
+ * @param {number} pointsPerWord - Points awarded per word (default: 50)
  * @returns {Promise<{roomCode: string, playerId: string}>}
  */
-export const createGameRoom = async (hostName, gameMode, difficulty) => {
+export const createGameRoom = async (
+  hostName,
+  gameMode,
+  difficulty,
+  maxRounds = 10,
+  livesPerPlayer = 3,
+  pointsPerWord = 50
+) => {
   if (!supabase) throw new Error('Supabase not configured');
   
   const roomCode = generateRoomCode();
   const hostId = crypto.randomUUID();
   
-  // Create game room
+  // Create game room with settings
   const { error: roomError } = await supabase
     .from('game_rooms')
     .insert({
@@ -28,12 +38,15 @@ export const createGameRoom = async (hostName, gameMode, difficulty) => {
       host_id: hostId,
       game_mode: gameMode,
       difficulty: difficulty,
+      max_rounds: maxRounds,
+      lives_per_player: livesPerPlayer,
+      points_per_word: pointsPerWord,
       status: 'waiting'
     });
   
   if (roomError) throw roomError;
   
-  // Add host as first player
+  // Add host as first player with initial lives
   const { error: playerError } = await supabase
     .from('players')
     .insert({
@@ -41,7 +54,8 @@ export const createGameRoom = async (hostName, gameMode, difficulty) => {
       room_code: roomCode,
       player_name: hostName,
       is_host: true,
-      score: 0
+      score: 0,
+      lives: livesPerPlayer
     });
   
   if (playerError) throw playerError;
@@ -85,7 +99,7 @@ export const joinGameRoom = async (roomCode, playerName) => {
     throw new Error('Name already taken');
   }
   
-  // Add player to room
+  // Add player to room with initial lives from room settings
   const playerId = crypto.randomUUID();
   const { error: playerError } = await supabase
     .from('players')
@@ -94,7 +108,8 @@ export const joinGameRoom = async (roomCode, playerName) => {
       room_code: roomCode.toUpperCase(),
       player_name: playerName,
       is_host: false,
-      score: 0
+      score: 0,
+      lives: room.lives_per_player || 3
     });
   
   if (playerError) throw playerError;
