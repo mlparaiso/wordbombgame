@@ -188,7 +188,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       console.log('Cleaning up timer for round', gameState.round_number);
       clearInterval(timer);
     };
-  }, [gameState, showingResults, countdown, gameStarted, handleRoundEnd]);
+  }, [gameState, showingResults, countdown, gameStarted, timeLeft, handleRoundEnd]);
 
   // Countdown between rounds
   useEffect(() => {
