@@ -6,8 +6,12 @@ function Chat({ roomCode, playerId, playerName }) {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [showEmojis, setShowEmojis] = useState(false);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
+
+  // Quick emoji reactions
+  const quickEmojis = ['👍', '❤️', '😂', '🎉', '🔥', '👏', '😮', '🤔', '💯', '🎯', '⚡', '✨'];
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -59,8 +63,26 @@ function Chat({ roomCode, playerId, playerName }) {
     try {
       await sendChatMessage(roomCode, playerId, playerName, trimmedMessage, false);
       setInputMessage('');
+      setShowEmojis(false);
     } catch (error) {
       console.error('Failed to send message:', error);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleEmojiClick = (emoji) => {
+    setInputMessage(prev => prev + emoji);
+  };
+
+  const handleQuickEmoji = async (emoji) => {
+    if (isSending) return;
+    
+    setIsSending(true);
+    try {
+      await sendChatMessage(roomCode, playerId, playerName, emoji, false);
+    } catch (error) {
+      console.error('Failed to send emoji:', error);
     } finally {
       setIsSending(false);
     }
@@ -112,7 +134,30 @@ function Chat({ roomCode, playerId, playerName }) {
         <div ref={messagesEndRef} />
       </div>
 
+      <div className="chat-emoji-bar">
+        {quickEmojis.map((emoji, index) => (
+          <button
+            key={index}
+            type="button"
+            className="quick-emoji-btn"
+            onClick={() => handleQuickEmoji(emoji)}
+            disabled={isSending}
+            title="Send quick reaction"
+          >
+            {emoji}
+          </button>
+        ))}
+      </div>
+
       <form className="chat-input-form" onSubmit={handleSendMessage}>
+        <button
+          type="button"
+          className="emoji-toggle-btn"
+          onClick={() => setShowEmojis(!showEmojis)}
+          title="Toggle emoji picker"
+        >
+          😊
+        </button>
         <input
           type="text"
           value={inputMessage}
@@ -130,6 +175,21 @@ function Chat({ roomCode, playerId, playerName }) {
           {isSending ? '...' : '📤'}
         </button>
       </form>
+
+      {showEmojis && (
+        <div className="emoji-picker">
+          {quickEmojis.map((emoji, index) => (
+            <button
+              key={index}
+              type="button"
+              className="emoji-btn"
+              onClick={() => handleEmojiClick(emoji)}
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

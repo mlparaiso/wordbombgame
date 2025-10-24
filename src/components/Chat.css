@@ -139,12 +139,82 @@
   font-weight: 500;
 }
 
+.chat-emoji-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.chat-emoji-bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.chat-emoji-bar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.chat-emoji-bar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.quick-emoji-btn {
+  padding: 6px 10px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.quick-emoji-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  border-color: #6366f1;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+.quick-emoji-btn:active:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.quick-emoji-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .chat-input-form {
   display: flex;
   gap: 8px;
   padding: 12px;
   background: white;
   border-top: 2px solid #e5e7eb;
+  position: relative;
+}
+
+.emoji-toggle-btn {
+  padding: 10px;
+  background: #f3f4f6;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.emoji-toggle-btn:hover {
+  background: #e5e7eb;
+  border-color: #6366f1;
+}
+
+.emoji-toggle-btn:active {
+  transform: scale(0.95);
 }
 
 .chat-input {
@@ -191,6 +261,54 @@
 .chat-send-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.emoji-picker {
+  position: absolute;
+  bottom: 100%;
+  left: 12px;
+  right: 12px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.2s ease-out;
+  z-index: 10;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.emoji-btn {
+  padding: 8px;
+  background: #f9fafb;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.emoji-btn:hover {
+  background: #e5e7eb;
+  border-color: #6366f1;
+  transform: scale(1.1);
+}
+
+.emoji-btn:active {
+  transform: scale(1.05);
 }
 
 /* Responsive */

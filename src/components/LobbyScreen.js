@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './LobbyScreen.css';
-import { getPlayers, subscribeToPlayers, selectTeam, leaveTeam, startGame } from '../lib/gameService';
+import { getPlayers, subscribeToPlayers, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
+import Chat from './Chat';
+import AdminControlPanel from './AdminControlPanel';
 
 const LETTER_COMBOS = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT',
@@ -24,6 +26,7 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [currentPlayerName, setCurrentPlayerName] = useState('');
 
   const loadPlayers = useCallback(async () => {
     try {
@@ -46,12 +49,28 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     };
   }, [roomCode, loadPlayers]);
 
+  // Get current player's name
+  useEffect(() => {
+    const currentPlayer = players.find(p => p.id === playerId);
+    if (currentPlayer) {
+      setCurrentPlayerName(currentPlayer.player_name);
+    }
+  }, [players, playerId]);
+
   const handleJoinTeam = async (teamNumber) => {
     setLoading(true);
     setError('');
     try {
       await selectTeam(playerId, teamNumber, roomCode);
       await loadPlayers();
+      // Send system message
+      await sendChatMessage(
+        roomCode, 
+        null, 
+        'System', 
+        `${currentPlayerName} joined Team ${TEAM_NAMES[teamNumber - 1]}`, 
+        true
+      );
     } catch (err) {
       setError(err.message || 'Failed to join team');
     } finally {
@@ -147,11 +166,12 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
 
   return (
     <div className="lobby-screen">
-      <button className="home-btn" onClick={handleLeave}>
-        🏠 Home
-      </button>
+      <div className="lobby-main">
+        <button className="home-btn" onClick={handleLeave}>
+          🏠 Home
+        </button>
 
-      <div className="lobby-header">
+        <div className="lobby-header">
         <h2>🎮 Game Lobby</h2>
         <div className="room-code-display">
           <span className="code-label">Room Code:</span>
@@ -252,21 +272,42 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
 
       {error && <div className="error-message">{error}</div>}
 
-      <div className="lobby-footer">
-        {isHost ? (
-          <button 
-            className="start-game-btn" 
-            onClick={handleStartGame}
-            disabled={loading || players.length < 2}
-          >
-            {loading ? 'Starting...' : 'Start Game'}
-          </button>
-        ) : (
-          <div className="waiting-message">
-            <div className="waiting-spinner"></div>
-            <p>Waiting for host to start the game...</p>
-          </div>
+        <div className="lobby-footer">
+          {isHost ? (
+            <button 
+              className="start-game-btn" 
+              onClick={handleStartGame}
+              disabled={loading || players.length < 2}
+            >
+              {loading ? 'Starting...' : 'Start Game'}
+            </button>
+          ) : (
+            <div className="waiting-message">
+              <div className="waiting-spinner"></div>
+              <p>Waiting for host to start the game...</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="lobby-sidebar">
+        {isHost && (
+          <AdminControlPanel
+            roomCode={roomCode}
+            players={players}
+            isPaused={false}
+            currentRound={0}
+            onEndGame={onLeave}
+          />
         )}
+        
+        <div className="sidebar-chat">
+          <Chat
+            roomCode={roomCode}
+            playerId={playerId}
+            playerName={currentPlayerName}
+          />
+        </div>
       </div>
     </div>
   );
