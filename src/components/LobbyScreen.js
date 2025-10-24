@@ -167,8 +167,8 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
   return (
     <div className="lobby-screen">
       <div className="lobby-main">
-        <button className="home-btn" onClick={handleLeave}>
-          🏠 Home
+        <button className="home-btn" onClick={handleLeave} title="Go Home">
+          🏠
         </button>
 
         <div className="lobby-header">
