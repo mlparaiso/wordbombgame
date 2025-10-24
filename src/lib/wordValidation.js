@@ -1,36 +1,23 @@
+import { isWordValid, getDictionaryStatus } from './dictionaryService';
+
 /**
- * Validates a word using the Datamuse API
+ * Validates a word using the local dictionary
  * @param {string} word - The word to validate
- * @returns {Promise<boolean>} - True if word is valid, false otherwise
+ * @returns {boolean} - True if word is valid, false otherwise
  */
-export const validateWord = async (word) => {
-  try {
-    const response = await fetch(
-      `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&max=1`
-    );
-    
-    if (!response.ok) {
-      console.warn('Datamuse API error, allowing word by default');
-      return true; // Allow word if API fails
-    }
-    
-    const data = await response.json();
-    
-    // Check if the API returned the exact word
-    if (data.length > 0 && data[0].word.toLowerCase() === word.toLowerCase()) {
-      return true;
-    }
-    
+export const validateWord = (word) => {
+  const status = getDictionaryStatus();
+  
+  if (!status.loaded) {
+    console.warn('Dictionary not loaded yet, validation may fail');
     return false;
-  } catch (error) {
-    console.error('Word validation error:', error);
-    // If API fails, allow the word to avoid frustrating players
-    return true;
   }
+  
+  return isWordValid(word);
 };
 
 /**
- * Validates a word with basic checks before API call
+ * Validates a word with basic checks before dictionary lookup
  * @param {string} word - The word to validate
  * @param {string} requiredCombo - The letter combination that must be in the word
  * @param {string[]} usedWords - Array of previously used words
@@ -57,8 +44,8 @@ export const validateWordComplete = async (word, requiredCombo, usedWords = []) 
     return { valid: false, message: 'Word must contain only letters!' };
   }
   
-  // Validate with Datamuse API
-  const isValidWord = await validateWord(trimmedWord);
+  // Validate with local dictionary (instant!)
+  const isValidWord = validateWord(trimmedWord);
   
   if (!isValidWord) {
     return { valid: false, message: 'Not a valid English word!' };

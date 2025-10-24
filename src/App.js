@@ -9,6 +9,7 @@ import JoinGameScreen from './components/JoinGameScreen';
 import LobbyScreen from './components/LobbyScreen';
 import { createGameRoom, joinGameRoom, subscribeToGameState } from './lib/gameService';
 import { validateWordComplete } from './lib/wordValidation';
+import { preloadDictionary } from './lib/dictionaryService';
 
 const letterCombos = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT', 'AY',
@@ -199,6 +200,11 @@ function App() {
     setScreen('game');
     setIsPlaying(true);
   };
+
+  // Preload dictionary on app initialization
+  useEffect(() => {
+    preloadDictionary();
+  }, []);
 
   // Subscribe to game state changes when in lobby
   useEffect(() => {
