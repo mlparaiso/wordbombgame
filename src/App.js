@@ -8,7 +8,7 @@ import GameOverScreen from './components/GameOverScreen';
 import CreateGameScreen from './components/CreateGameScreen';
 import JoinGameScreen from './components/JoinGameScreen';
 import LobbyScreen from './components/LobbyScreen';
-import { createGameRoom, joinGameRoom, subscribeToRoom, checkAndCleanupRoom } from './lib/gameService';
+import { createGameRoom, joinGameRoom, checkAndCleanupRoom } from './lib/gameService';
 import { validateWordComplete } from './lib/wordValidation';
 import { preloadDictionary } from './lib/dictionaryService';
 
@@ -234,21 +234,7 @@ function App() {
     preloadDictionary();
   }, []);
 
-  // Subscribe to room changes when in lobby
-  useEffect(() => {
-    if (screen === 'lobby' && roomCode) {
-      const subscription = subscribeToRoom(roomCode, (payload) => {
-        // When room status changes to 'playing', start the game
-        if (payload.new && payload.new.status === 'playing') {
-          handleGameStart();
-        }
-      });
-
-      return () => {
-        subscription.unsubscribe();
-      };
-    }
-  }, [screen, roomCode]);
+  // Note: Room status polling is now handled in LobbyScreen component
 
   // Timer effect
   useEffect(() => {
