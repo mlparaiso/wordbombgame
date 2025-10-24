@@ -38,15 +38,18 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     }
   }, [roomCode]);
 
+  // Poll for player updates instead of using broken realtime subscription
   useEffect(() => {
+    if (!roomCode) return;
+
+    // Load players immediately
     loadPlayers();
 
-    const subscription = subscribeToPlayers(roomCode, () => {
-      loadPlayers();
-    });
+    // Then poll every 2 seconds
+    const intervalId = setInterval(loadPlayers, 2000);
 
     return () => {
-      subscription.unsubscribe();
+      clearInterval(intervalId);
     };
   }, [roomCode, loadPlayers]);
 
