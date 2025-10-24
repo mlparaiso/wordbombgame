@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Bomb - Beat the Clock!</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💣 Word Bomb</h1>
+            <p class="subtitle">Type a word containing the letters before time runs out!</p>
+        </header>
+
+        <main>
+            <div class="game-screen" id="menuScreen">
+                <div class="menu-content">
+                    <h2>Welcome to Word Bomb!</h2>
+                    <p>Type words containing the given letter combination before the timer runs out.</p>
+                    <div class="difficulty-selector">
+                        <h3>Select Difficulty:</h3>
+                        <button class="difficulty-btn" data-difficulty="easy">Easy (15s)</button>
+                        <button class="difficulty-btn" data-difficulty="medium">Medium (10s)</button>
+                        <button class="difficulty-btn" data-difficulty="hard">Hard (7s)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-screen hidden" id="gameScreen">
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-label">Score</span>
+                        <span class="stat-value" id="score">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Round</span>
+                        <span class="stat-value" id="round">1</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Lives</span>
+                        <span class="stat-value" id="lives">❤️❤️❤️</span>
+                    </div>
+                </div>
+
+                <div class="timer-container">
+                    <div class="timer-bar" id="timerBar"></div>
+                    <span class="timer-text" id="timerText">10</span>
+                </div>
+
+                <div class="prompt-container">
+                    <p class="prompt-label">Your letters:</p>
+                    <div class="letter-combo" id="letterCombo">AB</div>
+                </div>
+
+                <div class="input-container">
+                    <input 
+                        type="text" 
+                        id="wordInput" 
+                        placeholder="Type your word here..."
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <button id="submitBtn">Submit</button>
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+
+                <div class="used-words">
+                    <h4>Words Used:</h4>
+                    <div id="usedWordsList"></div>
+                </div>
+            </div>
+
+            <div class="game-screen hidden" id="gameOverScreen">
+                <div class="game-over-content">
+                    <h2>💥 Game Over!</h2>
+                    <div class="final-stats">
+                        <p>Final Score: <span id="finalScore">0</span></p>
+                        <p>Rounds Completed: <span id="finalRound">0</span></p>
+                        <p>Words Found: <span id="totalWords">0</span></p>
+                    </div>
+                    <button id="playAgainBtn" class="difficulty-btn">Play Again</button>
+                    <button id="menuBtn" class="difficulty-btn secondary">Main Menu</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Created with ❤️ | Deploy on Netlify</p>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
