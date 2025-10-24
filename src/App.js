@@ -255,7 +255,7 @@ function App() {
 
   return (
     <div className="App">
-      <div className="container">
+      <div className={`container ${screen === 'lobby' ? 'full-width' : ''}`}>
         <header>
           <h1>💣 Team Myk Word Bomb</h1>
           <p className="subtitle">Type a word containing the letters before time runs out!</p>
