@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './LobbyScreen.css';
-import { getPlayers, subscribeToPlayers, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
+import { getPlayers, subscribeToPlayers, subscribeToRoom, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
 import Chat from './Chat';
 import AdminControlPanel from './AdminControlPanel';
 
@@ -23,6 +23,7 @@ const TEAM_COLORS = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
 const TEAM_NAMES = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Orange'];
 
 function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeave }) {
+  console.log('LobbyScreen rendered with roomCode:', roomCode);
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,6 +49,24 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
       subscription.unsubscribe();
     };
   }, [roomCode, loadPlayers]);
+
+  // Also subscribe to room status changes so joiners transition when host starts
+  useEffect(() => {
+    if (!roomCode) return;
+
+    console.log('LobbyScreen: Subscribing to room changes for roomCode:', roomCode);
+    const roomSub = subscribeToRoom(roomCode, (payload) => {
+      console.log('LobbyScreen: Room update received:', payload);
+      if (payload?.new && payload.new.status === 'playing') {
+        console.log('LobbyScreen: Room status is playing, calling onGameStart()');
+        onGameStart();
+      }
+    });
+
+    return () => {
+      if (roomSub && roomSub.unsubscribe) roomSub.unsubscribe();
+    };
+  }, [roomCode, onGameStart]);
 
   // Get current player's name
   useEffect(() => {
