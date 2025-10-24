@@ -39,6 +39,8 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const [hasAnswered, setHasAnswered] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showingResults, setShowingResults] = useState(false);
+  const [initialCountdown, setInitialCountdown] = useState(10); // 10 second countdown before Round 1
+  const [gameStarted, setGameStarted] = useState(false);
 
   const handleRoundEnd = useCallback(async () => {
     if (!isHost) return;
@@ -139,9 +141,26 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     return () => subscription.unsubscribe();
   }, [roomCode, gameState]);
 
+  // Initial countdown before Round 1
+  useEffect(() => {
+    if (!gameState || gameStarted || gameState.round_number !== 1) {
+      setGameStarted(true);
+      return;
+    }
+
+    if (initialCountdown > 0) {
+      const timer = setTimeout(() => {
+        setInitialCountdown(prev => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setGameStarted(true);
+    }
+  }, [gameState, initialCountdown, gameStarted]);
+
   // Timer countdown
   useEffect(() => {
-    if (!gameState || showingResults || countdown > 0) return;
+    if (!gameState || showingResults || countdown > 0 || !gameStarted) return;
 
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -156,7 +175,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     }, 100);
 
     return () => clearInterval(timer);
-  }, [gameState, showingResults, countdown, handleRoundEnd]);
+  }, [gameState, showingResults, countdown, gameStarted, handleRoundEnd]);
 
   // Countdown between rounds
   useEffect(() => {
@@ -178,6 +197,14 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     if (!word.trim() || hasAnswered || !gameState) return;
 
     const trimmedWord = word.trim().toLowerCase();
+    
+    // Check minimum length (4 letters for multiplayer)
+    if (trimmedWord.length < 4) {
+      setMessage('Word must be at least 4 letters');
+      setMessageType('error');
+      setTimeout(() => setMessage(''), 2000);
+      return;
+    }
     
     // Validate word
     const result = await validateWordComplete(trimmedWord, gameState.current_combo, []);
@@ -218,6 +245,31 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
 
   if (!gameState || !roomSettings) {
     return <div className="game-screen">Loading...</div>;
+  }
+
+  // Show initial countdown before Round 1
+  if (!gameStarted && initialCountdown > 0) {
+    return (
+      <div className="game-screen">
+        <div className="round-results">
+          <h2>🎮 Get Ready!</h2>
+          <div className="countdown-display">
+            <p>Game starts in</p>
+            <div className="countdown-number">{initialCountdown}</div>
+          </div>
+          <div className="current-standings">
+            <h3>Players:</h3>
+            {players.map((player, idx) => (
+              <div key={player.id} className="standing-item">
+                <span className="rank">#{idx + 1}</span>
+                <span className="player-name">{player.player_name}</span>
+                <span className="player-score">Ready!</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Show countdown between rounds
