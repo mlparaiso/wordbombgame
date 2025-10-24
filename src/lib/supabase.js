@@ -19,6 +19,11 @@ export const supabase = supabaseUrl && supabaseAnonKey
           'Content-Type': 'application/json',
         },
       },
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
+      },
     })
   : null;
 

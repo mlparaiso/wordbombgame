@@ -637,7 +637,7 @@ export const checkAndCleanupRoom = async (roomCode) => {
 export const subscribeToRoom = (roomCode, callback) => {
   if (!supabase) throw new Error('Supabase not configured');
   
-  return supabase
+  const channel = supabase
     .channel(`room:${roomCode}`)
     .on(
       'postgres_changes',
@@ -647,9 +647,16 @@ export const subscribeToRoom = (roomCode, callback) => {
         table: 'game_rooms',
         filter: `room_code=eq.${roomCode.toUpperCase()}`
       },
-      callback
+      (payload) => {
+        console.log('subscribeToRoom: Received update:', payload);
+        callback(payload);
+      }
     )
-    .subscribe();
+    .subscribe((status) => {
+      console.log(`subscribeToRoom: Subscription status for ${roomCode}:`, status);
+    });
+  
+  return channel;
 };
 
 /**
