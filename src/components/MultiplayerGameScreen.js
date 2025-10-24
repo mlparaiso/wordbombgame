@@ -7,8 +7,7 @@ import {
   subscribeToAnswers,
   submitAnswer,
   startNextRound,
-  endGame,
-  getLeaderboard
+  endGame
 } from '../lib/gameService';
 import { validateWordComplete } from '../lib/wordValidation';
 import { supabase } from '../lib/supabase';
@@ -40,6 +39,30 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const [hasAnswered, setHasAnswered] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showingResults, setShowingResults] = useState(false);
+
+  const handleRoundEnd = useCallback(async () => {
+    if (!isHost) return;
+
+    setShowingResults(true);
+    setCountdown(5); // 5 second countdown
+  }, [isHost]);
+
+  const handleNextRound = useCallback(async () => {
+    if (!isHost || !roomSettings || !gameState) return;
+
+    setShowingResults(false);
+
+    // Check if game should end
+    if (gameState.round_number >= roomSettings.max_rounds) {
+      await endGame(roomCode);
+      onGameEnd();
+      return;
+    }
+
+    // Start next round
+    const nextCombo = LETTER_COMBOS[Math.floor(Math.random() * LETTER_COMBOS.length)];
+    await startNextRound(roomCode, nextCombo, gameState.round_number + 1);
+  }, [isHost, roomSettings, gameState, roomCode, onGameEnd]);
 
   // Load initial data
   useEffect(() => {
@@ -133,7 +156,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     }, 100);
 
     return () => clearInterval(timer);
-  }, [gameState, showingResults, countdown]);
+  }, [gameState, showingResults, countdown, handleRoundEnd]);
 
   // Countdown between rounds
   useEffect(() => {
@@ -147,31 +170,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       // Countdown finished, start next round or end game
       handleNextRound();
     }
-  }, [countdown, showingResults]);
-
-  const handleRoundEnd = async () => {
-    if (!isHost) return;
-
-    setShowingResults(true);
-    setCountdown(5); // 5 second countdown
-  };
-
-  const handleNextRound = async () => {
-    if (!isHost || !roomSettings || !gameState) return;
-
-    setShowingResults(false);
-
-    // Check if game should end
-    if (gameState.round_number >= roomSettings.max_rounds) {
-      await endGame(roomCode);
-      onGameEnd();
-      return;
-    }
-
-    // Start next round
-    const nextCombo = LETTER_COMBOS[Math.floor(Math.random() * LETTER_COMBOS.length)];
-    await startNextRound(roomCode, nextCombo, gameState.round_number + 1);
-  };
+  }, [countdown, showingResults, handleNextRound]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
