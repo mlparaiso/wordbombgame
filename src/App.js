@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import HomeScreen from './components/HomeScreen';
 import MenuScreen from './components/MenuScreen';
 import GameScreen from './components/GameScreen';
 import GameOverScreen from './components/GameOverScreen';
+import CreateGameScreen from './components/CreateGameScreen';
+import JoinGameScreen from './components/JoinGameScreen';
+import LobbyScreen from './components/LobbyScreen';
+import { createGameRoom, joinGameRoom, subscribeToGameState } from './lib/gameService';
 
 const letterCombos = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT', 'AY',
@@ -33,7 +38,10 @@ const letterCombos = [
 ];
 
 function App() {
-  const [screen, setScreen] = useState('menu');
+  // Screen navigation
+  const [screen, setScreen] = useState('home');
+  
+  // Single-player game state
   const [difficulty, setDifficulty] = useState('medium');
   const [score, setScore] = useState(0);
   const [round, setRound] = useState(1);
@@ -44,10 +52,17 @@ function App() {
   const [maxTime, setMaxTime] = useState(10);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Multiplayer state
+  const [roomCode, setRoomCode] = useState('');
+  const [playerId, setPlayerId] = useState('');
+  const [gameMode, setGameMode] = useState('');
+  const [isHost, setIsHost] = useState(false);
+
   const getRandomCombo = useCallback(() => {
     return letterCombos[Math.floor(Math.random() * letterCombos.length)];
   }, []);
 
+  // Single-player: Start game
   const startGame = useCallback((selectedDifficulty) => {
     let time;
     switch(selectedDifficulty) {
@@ -127,12 +142,75 @@ function App() {
 
   const goToMenu = useCallback(() => {
     setIsPlaying(false);
-    setScreen('menu');
+    setScreen('home');
   }, []);
 
   const playAgain = useCallback(() => {
     startGame(difficulty);
   }, [difficulty, startGame]);
+
+  // Multiplayer: Create game
+  const handleCreateGame = async (playerName, selectedGameMode, selectedDifficulty) => {
+    try {
+      const { roomCode: newRoomCode, playerId: newPlayerId } = await createGameRoom(
+        playerName,
+        selectedGameMode,
+        selectedDifficulty
+      );
+      
+      setRoomCode(newRoomCode);
+      setPlayerId(newPlayerId);
+      setGameMode(selectedGameMode);
+      setIsHost(true);
+      setScreen('lobby');
+    } catch (error) {
+      console.error('Failed to create game:', error);
+      throw error;
+    }
+  };
+
+  // Multiplayer: Join game
+  const handleJoinGame = async (code, playerName) => {
+    try {
+      const { playerId: newPlayerId, gameMode: joinedGameMode } = await joinGameRoom(
+        code,
+        playerName
+      );
+      
+      setRoomCode(code);
+      setPlayerId(newPlayerId);
+      setGameMode(joinedGameMode);
+      setIsHost(false);
+      setScreen('lobby');
+    } catch (error) {
+      console.error('Failed to join game:', error);
+      throw error;
+    }
+  };
+
+  // Multiplayer: Game started
+  const handleGameStart = () => {
+    // For now, redirect to single-player game screen
+    // TODO: Create MultiplayerGameScreen component
+    setScreen('game');
+    setIsPlaying(true);
+  };
+
+  // Subscribe to game state changes when in lobby
+  useEffect(() => {
+    if (screen === 'lobby' && roomCode) {
+      const subscription = subscribeToGameState(roomCode, (payload) => {
+        // When game state changes to 'playing', start the game
+        if (payload.new && payload.new.status === 'playing') {
+          handleGameStart();
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [screen, roomCode]);
 
   // Timer effect
   useEffect(() => {
@@ -162,8 +240,40 @@ function App() {
         </header>
 
         <main>
+          {screen === 'home' && (
+            <HomeScreen
+              onPlaySolo={() => setScreen('menu')}
+              onCreateGame={() => setScreen('create')}
+              onJoinGame={() => setScreen('join')}
+            />
+          )}
+
           {screen === 'menu' && (
             <MenuScreen onStartGame={startGame} />
+          )}
+
+          {screen === 'create' && (
+            <CreateGameScreen
+              onCreateGame={handleCreateGame}
+              onBack={() => setScreen('home')}
+            />
+          )}
+
+          {screen === 'join' && (
+            <JoinGameScreen
+              onJoinGame={handleJoinGame}
+              onBack={() => setScreen('home')}
+            />
+          )}
+
+          {screen === 'lobby' && (
+            <LobbyScreen
+              roomCode={roomCode}
+              playerId={playerId}
+              isHost={isHost}
+              gameMode={gameMode}
+              onGameStart={handleGameStart}
+            />
           )}
 
           {screen === 'game' && (
