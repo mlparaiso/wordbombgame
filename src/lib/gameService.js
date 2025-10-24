@@ -629,39 +629,25 @@ export const checkAndCleanupRoom = async (roomCode) => {
 };
 
 /**
- * Subscribe to room changes (for pause/resume/settings)
+ * Check room status (for polling instead of realtime subscriptions)
  * @param {string} roomCode - The room code
- * @param {Function} callback - Callback function when room changes
- * @returns {Object} Subscription object
+ * @returns {Promise<string|null>} The room status or null if not found
  */
-export const subscribeToRoom = (roomCode, callback) => {
+export const checkRoomStatus = async (roomCode) => {
   if (!supabase) throw new Error('Supabase not configured');
   
-  const channel = supabase
-    .channel(`room:${roomCode}`)
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'game_rooms'
-      },
-      (payload) => {
-        console.log('subscribeToRoom: Received update:', payload);
-        // Filter on the client side instead
-        if (payload.new && payload.new.room_code === roomCode.toUpperCase()) {
-          callback(payload);
-        }
-      }
-    )
-    .subscribe((status) => {
-      console.log(`subscribeToRoom: Subscription status for ${roomCode}:`, status);
-      if (status === 'CHANNEL_ERROR') {
-        console.error('Channel error details - this might be an RLS or Realtime configuration issue');
-      }
-    });
+  const { data, error } = await supabase
+    .from('game_rooms')
+    .select('status, is_paused')
+    .eq('room_code', roomCode.toUpperCase())
+    .single();
   
-  return channel;
+  if (error) {
+    console.error('Error checking room status:', error);
+    return null;
+  }
+  
+  return data;
 };
 
 /**

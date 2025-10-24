@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './LobbyScreen.css';
-import { getPlayers, subscribeToPlayers, subscribeToRoom, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
+import { getPlayers, subscribeToPlayers, checkRoomStatus, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
 import Chat from './Chat';
 import AdminControlPanel from './AdminControlPanel';
 
@@ -50,21 +50,40 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     };
   }, [roomCode, loadPlayers]);
 
-  // Also subscribe to room status changes so joiners transition when host starts
+  // Poll room status so joiners transition when host starts
   useEffect(() => {
     if (!roomCode) return;
 
-    console.log('LobbyScreen: Subscribing to room changes for roomCode:', roomCode);
-    const roomSub = subscribeToRoom(roomCode, (payload) => {
-      console.log('LobbyScreen: Room update received:', payload);
-      if (payload?.new && payload.new.status === 'playing') {
-        console.log('LobbyScreen: Room status is playing, calling onGameStart()');
-        onGameStart();
+    console.log('LobbyScreen: Starting polling for room status:', roomCode);
+    let isActive = true;
+
+    const pollRoomStatus = async () => {
+      if (!isActive) return;
+      
+      try {
+        const roomData = await checkRoomStatus(roomCode);
+        console.log('LobbyScreen: Polled room status:', roomData);
+        
+        if (roomData && roomData.status === 'playing') {
+          console.log('LobbyScreen: Room status is playing, calling onGameStart()');
+          isActive = false; // Stop polling
+          onGameStart();
+        }
+      } catch (error) {
+        console.error('Error polling room status:', error);
       }
-    });
+    };
+
+    // Poll immediately
+    pollRoomStatus();
+
+    // Then poll every 2 seconds
+    const intervalId = setInterval(pollRoomStatus, 2000);
 
     return () => {
-      if (roomSub && roomSub.unsubscribe) roomSub.unsubscribe();
+      isActive = false;
+      clearInterval(intervalId);
+      console.log('LobbyScreen: Stopped polling for room status');
     };
   }, [roomCode, onGameStart]);
 
