@@ -75,12 +75,12 @@ export const createGameRoom = async (
 export const joinGameRoom = async (roomCode, playerName) => {
   if (!supabase) throw new Error('Supabase not configured');
   
-  // Check if room exists and is waiting
+  // Check if room exists and is waiting or playing (allow joining games in progress)
   const { data: rooms, error: roomError } = await supabase
     .from('game_rooms')
     .select('*')
     .eq('room_code', roomCode.toUpperCase())
-    .eq('status', 'waiting');
+    .in('status', ['waiting', 'playing']);
   
   if (roomError) {
     console.error('Error fetching room:', roomError);
@@ -88,7 +88,7 @@ export const joinGameRoom = async (roomCode, playerName) => {
   }
   
   if (!rooms || rooms.length === 0) {
-    throw new Error('Room not found or game already started');
+    throw new Error('Room not found or game has ended');
   }
   
   // Use the first matching room (there should only be one)

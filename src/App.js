@@ -260,7 +260,9 @@ function App() {
       <div className={`container ${screen === 'lobby' ? 'full-width' : ''}`}>
         <header>
           <h1>💣 Team Myk Word Bomb</h1>
-          <p className="subtitle">Type a word containing the letters before time runs out!</p>
+          {roomCode && (screen === 'lobby' || screen === 'multiplayer-game') && (
+            <p className="subtitle">Room Code: <strong>{roomCode}</strong></p>
+          )}
         </header>
 
         <main>
