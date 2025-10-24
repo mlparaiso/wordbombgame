@@ -76,19 +76,23 @@ export const joinGameRoom = async (roomCode, playerName) => {
   if (!supabase) throw new Error('Supabase not configured');
   
   // Check if room exists and is waiting
-  const { data: room, error: roomError } = await supabase
+  const { data: rooms, error: roomError } = await supabase
     .from('game_rooms')
     .select('*')
     .eq('room_code', roomCode.toUpperCase())
-    .single();
+    .eq('status', 'waiting');
   
-  if (roomError || !room) {
-    throw new Error('Room not found');
+  if (roomError) {
+    console.error('Error fetching room:', roomError);
+    throw new Error('Failed to check room');
   }
   
-  if (room.status !== 'waiting') {
-    throw new Error('Game already started');
+  if (!rooms || rooms.length === 0) {
+    throw new Error('Room not found or game already started');
   }
+  
+  // Use the first matching room (there should only be one)
+  const room = rooms[0];
   
   // Check if name is already taken by an active player
   const { data: existingPlayer } = await supabase
@@ -597,6 +601,32 @@ export const kickPlayer = async (playerId) => {
     .eq('id', playerId);
   
   if (error) throw error;
+};
+
+/**
+ * Check if a room is empty and mark it as abandoned
+ * @param {string} roomCode - The room code to check
+ */
+export const checkAndCleanupRoom = async (roomCode) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  // Get active players in the room
+  const { data: activePlayers } = await supabase
+    .from('players')
+    .select('id')
+    .eq('room_code', roomCode.toUpperCase())
+    .eq('is_active', true);
+  
+  // If no active players, mark room as abandoned
+  if (!activePlayers || activePlayers.length === 0) {
+    await supabase
+      .from('game_rooms')
+      .update({ 
+        status: 'abandoned',
+        finished_at: new Date().toISOString()
+      })
+      .eq('room_code', roomCode.toUpperCase());
+  }
 };
 
 /**

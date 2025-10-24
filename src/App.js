@@ -7,7 +7,7 @@ import GameOverScreen from './components/GameOverScreen';
 import CreateGameScreen from './components/CreateGameScreen';
 import JoinGameScreen from './components/JoinGameScreen';
 import LobbyScreen from './components/LobbyScreen';
-import { createGameRoom, joinGameRoom, subscribeToGameState } from './lib/gameService';
+import { createGameRoom, joinGameRoom, subscribeToGameState, checkAndCleanupRoom } from './lib/gameService';
 import { validateWordComplete } from './lib/wordValidation';
 import { preloadDictionary } from './lib/dictionaryService';
 
@@ -136,14 +136,31 @@ function App() {
     return { success: true, message: `+${points} points! Great word!` };
   }, [isPlaying, currentCombo, usedWords, startNewRound]);
 
-  const goToHome = useCallback(() => {
+  const goToHome = useCallback(async () => {
     setIsPlaying(false);
+    
+    // Mark player as inactive and cleanup room if empty
+    if (roomCode && playerId) {
+      try {
+        const { supabase } = await import('./lib/supabase');
+        await supabase
+          .from('players')
+          .update({ is_active: false })
+          .eq('id', playerId);
+        
+        // Check if room should be marked as abandoned
+        await checkAndCleanupRoom(roomCode);
+      } catch (error) {
+        console.error('Error during cleanup:', error);
+      }
+    }
+    
     setRoomCode('');
     setPlayerId('');
     setGameMode('');
     setIsHost(false);
     setScreen('home');
-  }, []);
+  }, [roomCode, playerId]);
 
   const goToMenu = useCallback(() => {
     setIsPlaying(false);
