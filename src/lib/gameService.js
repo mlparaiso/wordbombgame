@@ -644,16 +644,21 @@ export const subscribeToRoom = (roomCode, callback) => {
       {
         event: 'UPDATE',
         schema: 'public',
-        table: 'game_rooms',
-        filter: `room_code=eq.${roomCode.toUpperCase()}`
+        table: 'game_rooms'
       },
       (payload) => {
         console.log('subscribeToRoom: Received update:', payload);
-        callback(payload);
+        // Filter on the client side instead
+        if (payload.new && payload.new.room_code === roomCode.toUpperCase()) {
+          callback(payload);
+        }
       }
     )
     .subscribe((status) => {
       console.log(`subscribeToRoom: Subscription status for ${roomCode}:`, status);
+      if (status === 'CHANNEL_ERROR') {
+        console.error('Channel error details - this might be an RLS or Realtime configuration issue');
+      }
     });
   
   return channel;
