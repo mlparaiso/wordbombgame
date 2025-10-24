@@ -165,7 +165,7 @@ function App() {
     isSpectator = false
   ) => {
     try {
-      const { roomCode: newRoomCode, playerId: newPlayerId, isSpectator: spectatorMode } = await createGameRoom(
+      const { roomCode: newRoomCode, playerId: newPlayerId } = await createGameRoom(
         playerName,
         selectedGameMode,
         selectedDifficulty,

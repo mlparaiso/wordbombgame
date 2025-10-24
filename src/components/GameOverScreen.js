@@ -22,12 +22,6 @@ function GameOverScreen({
 
   const isTeamMode = gameMode && gameMode.startsWith('team_');
 
-  useEffect(() => {
-    if (isMultiplayer && roomCode) {
-      loadScores();
-    }
-  }, [isMultiplayer, roomCode, gameMode]);
-
   const loadScores = async () => {
     setLoading(true);
     try {
@@ -46,6 +40,12 @@ function GameOverScreen({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isMultiplayer && roomCode) {
+      loadScores();
+    }
+  }, [isMultiplayer, roomCode, gameMode, loadScores]);
 
   // Single-player mode
   if (!isMultiplayer) {

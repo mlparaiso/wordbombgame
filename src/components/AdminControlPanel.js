@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './AdminControlPanel.css';
-import { pauseGame, resumeGame, kickPlayer, endGame, startNextRound, sendChatMessage } from '../lib/gameService';
+import { pauseGame, resumeGame, kickPlayer, endGame, sendChatMessage } from '../lib/gameService';
 
 function AdminControlPanel({ 
   roomCode, 
