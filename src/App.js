@@ -3,11 +3,12 @@ import './App.css';
 import HomeScreen from './components/HomeScreen';
 import MenuScreen from './components/MenuScreen';
 import GameScreen from './components/GameScreen';
+import MultiplayerGameScreen from './components/MultiplayerGameScreen';
 import GameOverScreen from './components/GameOverScreen';
 import CreateGameScreen from './components/CreateGameScreen';
 import JoinGameScreen from './components/JoinGameScreen';
 import LobbyScreen from './components/LobbyScreen';
-import { createGameRoom, joinGameRoom, subscribeToGameState, checkAndCleanupRoom } from './lib/gameService';
+import { createGameRoom, joinGameRoom, subscribeToRoom, checkAndCleanupRoom } from './lib/gameService';
 import { validateWordComplete } from './lib/wordValidation';
 import { preloadDictionary } from './lib/dictionaryService';
 
@@ -224,9 +225,7 @@ function App() {
 
   // Multiplayer: Game started
   const handleGameStart = () => {
-    // For now, redirect to single-player game screen
-    // TODO: Create MultiplayerGameScreen component
-    setScreen('game');
+    setScreen('multiplayer-game');
     setIsPlaying(true);
   };
 
@@ -235,11 +234,11 @@ function App() {
     preloadDictionary();
   }, []);
 
-  // Subscribe to game state changes when in lobby
+  // Subscribe to room changes when in lobby
   useEffect(() => {
     if (screen === 'lobby' && roomCode) {
-      const subscription = subscribeToGameState(roomCode, (payload) => {
-        // When game state changes to 'playing', start the game
+      const subscription = subscribeToRoom(roomCode, (payload) => {
+        // When room status changes to 'playing', start the game
         if (payload.new && payload.new.status === 'playing') {
           handleGameStart();
         }
@@ -328,6 +327,15 @@ function App() {
               onSubmitWord={submitWord}
               isPlaying={isPlaying}
               onExit={goToHome}
+            />
+          )}
+
+          {screen === 'multiplayer-game' && (
+            <MultiplayerGameScreen
+              roomCode={roomCode}
+              playerId={playerId}
+              isHost={isHost}
+              onGameEnd={goToHome}
             />
           )}
 
