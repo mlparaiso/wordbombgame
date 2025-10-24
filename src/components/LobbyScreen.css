@@ -57,7 +57,7 @@
 
 .lobby-header {
   text-align: center;
-  color: white;
+  color: #333;
   margin-bottom: 2rem;
   margin-top: 0;
 }
@@ -65,10 +65,11 @@
 .lobby-header h2 {
   font-size: 2rem;
   margin-bottom: 0.75rem;
+  color: #667eea;
 }
 
 .room-code-display {
-  background: rgba(255, 255, 255, 0.2);
+  background: #667eea;
   padding: 0.5rem 1.5rem;
   border-radius: 8px;
   display: inline-block;
@@ -77,7 +78,7 @@
 
 .code-label {
   font-size: 0.85rem;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.9);
   margin-right: 0.5rem;
 }
 
@@ -85,11 +86,12 @@
   font-size: 1.2rem;
   font-weight: bold;
   letter-spacing: 0.15em;
+  color: white;
 }
 
 .player-count {
   font-size: 1rem;
-  opacity: 0.9;
+  color: #666;
 }
 
 .lobby-content {
@@ -151,7 +153,7 @@
 }
 
 .team-selection-title {
-  color: white;
+  color: #333;
   text-align: center;
   font-size: 1.4rem;
   margin-bottom: 1.25rem;
@@ -405,15 +407,15 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  color: white;
+  color: #667eea;
   font-size: 1rem;
 }
 
 .waiting-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-top-color: #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
