@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './GameOverScreen.css';
 import { getTeamScores, getLeaderboard } from '../lib/gameService';
 
@@ -22,7 +22,7 @@ function GameOverScreen({
 
   const isTeamMode = gameMode && gameMode.startsWith('team_');
 
-  const loadScores = async () => {
+  const loadScores = useCallback(async () => {
     setLoading(true);
     try {
       if (isTeamMode) {
@@ -39,13 +39,13 @@ function GameOverScreen({
     } finally {
       setLoading(false);
     }
-  };
+  }, [isTeamMode, roomCode]);
 
   useEffect(() => {
     if (isMultiplayer && roomCode) {
       loadScores();
     }
-  }, [isMultiplayer, roomCode, gameMode, loadScores]);
+  }, [isMultiplayer, roomCode, loadScores]);
 
   // Single-player mode
   if (!isMultiplayer) {
