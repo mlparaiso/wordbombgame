@@ -8,6 +8,7 @@ import CreateGameScreen from './components/CreateGameScreen';
 import JoinGameScreen from './components/JoinGameScreen';
 import LobbyScreen from './components/LobbyScreen';
 import { createGameRoom, joinGameRoom, subscribeToGameState } from './lib/gameService';
+import { validateWordComplete } from './lib/wordValidation';
 
 const letterCombos = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT', 'AY',
@@ -110,24 +111,18 @@ function App() {
     }
   }, [lives, startNewRound]);
 
-  const submitWord = useCallback((word) => {
+  const submitWord = useCallback(async (word) => {
     if (!isPlaying) return { success: false, message: '' };
 
+    // Validate word using the complete validation with API check
+    const result = await validateWordComplete(word, currentCombo, usedWords);
+    
+    if (!result.valid) {
+      return { success: false, message: result.message };
+    }
+
+    // Word is valid - award points
     const trimmedWord = word.trim().toLowerCase();
-
-    if (trimmedWord.length < 3) {
-      return { success: false, message: 'Word must be at least 3 letters!' };
-    }
-
-    if (!trimmedWord.includes(currentCombo.toLowerCase())) {
-      return { success: false, message: `Word must contain "${currentCombo}"!` };
-    }
-
-    if (usedWords.includes(trimmedWord)) {
-      return { success: false, message: 'Word already used!' };
-    }
-
-    // Word is valid
     const points = Math.max(10, trimmedWord.length * 5);
     setScore(prev => prev + points);
     setUsedWords(prev => [...prev, trimmedWord]);

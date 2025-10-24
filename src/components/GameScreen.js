@@ -29,8 +29,13 @@ function GameScreen({
     setFeedback({ message: '', type: '' });
   }, [currentCombo]);
 
-  const handleSubmit = () => {
-    const result = onSubmitWord(inputValue);
+  const handleSubmit = async () => {
+    if (!inputValue.trim()) return;
+    
+    // Show loading state
+    setFeedback({ message: 'Checking word...', type: '' });
+    
+    const result = await onSubmitWord(inputValue);
     
     if (result.success) {
       setFeedback({ message: result.message, type: 'success' });
