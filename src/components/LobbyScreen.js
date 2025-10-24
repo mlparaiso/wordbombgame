@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './LobbyScreen.css';
 import { getPlayers, subscribeToPlayers, assignTeams, startGame } from '../lib/gameService';
 
@@ -22,6 +22,15 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const loadPlayers = useCallback(async () => {
+    try {
+      const playerList = await getPlayers(roomCode);
+      setPlayers(playerList);
+    } catch (err) {
+      console.error('Failed to load players:', err);
+    }
+  }, [roomCode]);
+
   useEffect(() => {
     loadPlayers();
 
@@ -32,16 +41,7 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [roomCode]);
-
-  const loadPlayers = async () => {
-    try {
-      const playerList = await getPlayers(roomCode);
-      setPlayers(playerList);
-    } catch (err) {
-      console.error('Failed to load players:', err);
-    }
-  };
+  }, [roomCode, loadPlayers]);
 
   const handleAssignTeams = async () => {
     setLoading(true);
