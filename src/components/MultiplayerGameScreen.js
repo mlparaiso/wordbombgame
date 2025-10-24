@@ -165,17 +165,13 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   // Timer countdown
   useEffect(() => {
     if (!gameState || showingResults || countdown > 0 || !gameStarted) {
-      console.log('Timer blocked:', { gameState: !!gameState, showingResults, countdown, gameStarted });
       return;
     }
-
-    console.log('Starting timer for round', gameState.round_number, 'with time:', timeLeft);
 
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         const newTime = prev - 0.1;
         if (newTime <= 0) {
-          console.log('Timer expired for round', gameState.round_number);
           clearInterval(timer);
           handleRoundEnd();
           return 0;
@@ -185,10 +181,9 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     }, 100);
 
     return () => {
-      console.log('Cleaning up timer for round', gameState.round_number);
       clearInterval(timer);
     };
-  }, [gameState, showingResults, countdown, gameStarted, timeLeft, handleRoundEnd]);
+  }, [gameState, showingResults, countdown, gameStarted, handleRoundEnd]);
 
   // Countdown between rounds
   useEffect(() => {
