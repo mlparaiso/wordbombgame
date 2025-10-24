@@ -10,7 +10,8 @@ function GameScreen({
   currentCombo, 
   usedWords, 
   onSubmitWord,
-  isPlaying 
+  isPlaying,
+  onExit
 }) {
   const [inputValue, setInputValue] = useState('');
   const [feedback, setFeedback] = useState({ message: '', type: '' });
@@ -47,12 +48,27 @@ function GameScreen({
     }
   };
 
+  const handleExit = () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to exit? Your progress will be lost.'
+    );
+    if (confirmed && onExit) {
+      onExit();
+    }
+  };
+
   const percentage = (timeLeft / maxTime) * 100;
   const hearts = '❤️'.repeat(lives);
   const emptyHearts = '🖤'.repeat(3 - lives);
 
   return (
     <div className="game-screen">
+      {onExit && (
+        <button className="exit-btn" onClick={handleExit}>
+          🏠 Exit
+        </button>
+      )}
+
       <div className="stats">
         <div className="stat">
           <span className="stat-label">Score</span>

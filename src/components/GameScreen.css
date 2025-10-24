@@ -1,5 +1,27 @@
 .game-screen {
-  animation: slideIn 0.3s ease-out;
+  animation: fadeIn 0.5s ease-in;
+  position: relative;
+}
+
+.exit-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.exit-btn:hover {
+  background: rgba(220, 38, 38, 1);
+  transform: translateX(2px);
 }
 
 @keyframes slideIn {

@@ -140,6 +140,15 @@ function App() {
     return { success: true, message: `+${points} points! Great word!` };
   }, [isPlaying, currentCombo, usedWords, startNewRound]);
 
+  const goToHome = useCallback(() => {
+    setIsPlaying(false);
+    setRoomCode('');
+    setPlayerId('');
+    setGameMode('');
+    setIsHost(false);
+    setScreen('home');
+  }, []);
+
   const goToMenu = useCallback(() => {
     setIsPlaying(false);
     setScreen('home');
@@ -235,7 +244,7 @@ function App() {
     <div className="App">
       <div className="container">
         <header>
-          <h1>💣 Word Bomb</h1>
+          <h1>💣 Team Myk Word Bomb</h1>
           <p className="subtitle">Type a word containing the letters before time runs out!</p>
         </header>
 
@@ -273,6 +282,7 @@ function App() {
               isHost={isHost}
               gameMode={gameMode}
               onGameStart={handleGameStart}
+              onLeave={goToHome}
             />
           )}
 
@@ -287,6 +297,7 @@ function App() {
               usedWords={usedWords}
               onSubmitWord={submitWord}
               isPlaying={isPlaying}
+              onExit={goToHome}
             />
           )}
 

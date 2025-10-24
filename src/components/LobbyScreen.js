@@ -17,7 +17,7 @@ const LETTER_COMBOS = [
   'VI', 'WA', 'WE', 'WH', 'WI', 'WO', 'WR', 'YE', 'YO'
 ];
 
-function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart }) {
+function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeave }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -75,6 +75,22 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart }) {
     }
   };
 
+  const handleLeave = () => {
+    if (isHost) {
+      const confirmed = window.confirm(
+        'You are the host. Leaving will end the game for all players. Are you sure?'
+      );
+      if (confirmed) {
+        onLeave();
+      }
+    } else {
+      const confirmed = window.confirm('Are you sure you want to leave the lobby?');
+      if (confirmed) {
+        onLeave();
+      }
+    }
+  };
+
   const isTeamMode = gameMode.startsWith('team_');
   const teamSize = isTeamMode ? parseInt(gameMode.split('_')[1]) : 0;
 
@@ -90,6 +106,10 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart }) {
 
   return (
     <div className="lobby-screen">
+      <button className="leave-btn" onClick={handleLeave}>
+        ← Leave
+      </button>
+
       <div className="lobby-header">
         <h2>🎮 Game Lobby</h2>
         <div className="room-code-display">
