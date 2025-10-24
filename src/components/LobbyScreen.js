@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './LobbyScreen.css';
-import { getPlayers, subscribeToPlayers, assignTeams, startGame } from '../lib/gameService';
+import { getPlayers, subscribeToPlayers, selectTeam, leaveTeam, startGame } from '../lib/gameService';
 
 const LETTER_COMBOS = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT',
@@ -16,6 +16,9 @@ const LETTER_COMBOS = [
   'TH', 'TI', 'TO', 'TR', 'TU', 'TW', 'UN', 'UP', 'UR', 'US', 'UT', 'VE',
   'VI', 'WA', 'WE', 'WH', 'WI', 'WO', 'WR', 'YE', 'YO'
 ];
+
+const TEAM_COLORS = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
+const TEAM_NAMES = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Orange'];
 
 function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeave }) {
   const [players, setPlayers] = useState([]);
@@ -43,21 +46,40 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     };
   }, [roomCode, loadPlayers]);
 
-  const handleAssignTeams = async () => {
+  const handleJoinTeam = async (teamNumber) => {
     setLoading(true);
     setError('');
     try {
-      const teamSize = parseInt(gameMode.split('_')[1]);
-      await assignTeams(roomCode, teamSize, true);
+      await selectTeam(playerId, teamNumber, roomCode);
       await loadPlayers();
     } catch (err) {
-      setError('Failed to assign teams');
+      setError(err.message || 'Failed to join team');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLeaveTeam = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await leaveTeam(playerId, roomCode);
+      await loadPlayers();
+    } catch (err) {
+      setError(err.message || 'Failed to leave team');
     } finally {
       setLoading(false);
     }
   };
 
   const handleStartGame = async () => {
+    // Check if all players are assigned to teams
+    const unassignedPlayers = players.filter(p => !p.team_number);
+    if (unassignedPlayers.length > 0 && isTeamMode) {
+      setError(`${unassignedPlayers.length} player(s) still in waiting area`);
+      return;
+    }
+
     if (players.length < 2) {
       setError('Need at least 2 players to start');
       return;
@@ -94,15 +116,34 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
   const isTeamMode = gameMode.startsWith('team_');
   const teamSize = isTeamMode ? parseInt(gameMode.split('_')[1]) : 0;
 
+  // Calculate number of teams dynamically
+  const totalPlayers = players.length;
+  const maxPossibleTeams = Math.floor(totalPlayers / teamSize);
+  const numberOfTeams = isTeamMode ? Math.max(2, maxPossibleTeams) : 0;
+
   // Group players by team
   const teams = {};
+  const waitingPlayers = [];
+  
   if (isTeamMode) {
+    // Initialize teams
+    for (let i = 1; i <= numberOfTeams; i++) {
+      teams[i] = [];
+    }
+    
+    // Assign players to teams or waiting area
     players.forEach(player => {
-      const teamNum = player.team_number || 0;
-      if (!teams[teamNum]) teams[teamNum] = [];
-      teams[teamNum].push(player);
+      if (player.team_number && player.team_number <= numberOfTeams) {
+        teams[player.team_number].push(player);
+      } else {
+        waitingPlayers.push(player);
+      }
     });
   }
+
+  // Find current player's team
+  const currentPlayer = players.find(p => p.id === playerId);
+  const currentTeam = currentPlayer?.team_number;
 
   return (
     <div className="lobby-screen">
@@ -131,39 +172,79 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
             ))}
           </div>
         ) : (
-          <div className="teams-container">
-            {Object.keys(teams).length === 0 ? (
-              <div className="no-teams">
-                <p>Teams not assigned yet</p>
-                {isHost && (
-                  <button 
-                    className="assign-teams-btn" 
-                    onClick={handleAssignTeams}
-                    disabled={loading || players.length < teamSize * 2}
+          <div className="team-selection-container">
+            <h3 className="team-selection-title">Choose Your Team</h3>
+            
+            <div className="teams-grid">
+              {Object.entries(teams).map(([teamNum, teamPlayers]) => {
+                const teamNumber = parseInt(teamNum);
+                const isFull = teamPlayers.length >= teamSize;
+                const isCurrentTeam = currentTeam === teamNumber;
+                
+                return (
+                  <div 
+                    key={teamNum} 
+                    className={`team-card ${isCurrentTeam ? 'current-team' : ''} ${isFull ? 'team-full' : ''}`}
                   >
-                    {loading ? 'Assigning...' : 'Assign Teams Randomly'}
-                  </button>
-                )}
-                {players.length < teamSize * 2 && (
-                  <p className="team-warning">
-                    Need at least {teamSize * 2} players for {teamSize}v{teamSize}
-                  </p>
-                )}
-              </div>
-            ) : (
-              Object.entries(teams).map(([teamNum, teamPlayers]) => (
-                <div key={teamNum} className={`team-card team-${teamNum}`}>
-                  <h3>Team {teamNum}</h3>
-                  <div className="team-players">
-                    {teamPlayers.map(player => (
-                      <div key={player.id} className="team-player">
-                        {player.player_name}
-                        {player.is_host && ' 👑'}
-                      </div>
-                    ))}
+                    <div className="team-header">
+                      <span className="team-icon">{TEAM_COLORS[teamNumber - 1]}</span>
+                      <h4>Team {TEAM_NAMES[teamNumber - 1]}</h4>
+                      <span className="team-count">{teamPlayers.length}/{teamSize}</span>
+                    </div>
+                    
+                    <div className="team-players-list">
+                      {teamPlayers.map(player => (
+                        <div key={player.id} className="team-player-item">
+                          <span>{player.player_name}</span>
+                          {player.is_host && <span className="mini-crown">👑</span>}
+                        </div>
+                      ))}
+                      {[...Array(teamSize - teamPlayers.length)].map((_, i) => (
+                        <div key={`empty-${i}`} className="team-player-item empty-slot">
+                          <span>Empty Slot</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {isCurrentTeam ? (
+                      <button 
+                        className="leave-team-btn"
+                        onClick={handleLeaveTeam}
+                        disabled={loading}
+                      >
+                        Leave Team
+                      </button>
+                    ) : (
+                      <button 
+                        className="join-team-btn"
+                        onClick={() => handleJoinTeam(teamNumber)}
+                        disabled={loading || isFull}
+                      >
+                        {isFull ? 'FULL' : 'Join Team'}
+                      </button>
+                    )}
                   </div>
+                );
+              })}
+            </div>
+
+            {waitingPlayers.length > 0 && (
+              <div className="waiting-area">
+                <div className="waiting-header">
+                  <span className="waiting-icon">⏳</span>
+                  <h4>Waiting Area</h4>
+                  <span className="waiting-count">{waitingPlayers.length} player{waitingPlayers.length !== 1 ? 's' : ''}</span>
                 </div>
-              ))
+                <div className="waiting-players-list">
+                  {waitingPlayers.map(player => (
+                    <div key={player.id} className="waiting-player-item">
+                      <span>{player.player_name}</span>
+                      {player.is_host && <span className="mini-crown">👑</span>}
+                    </div>
+                  ))}
+                </div>
+                <p className="waiting-hint">💡 Click a team above to join!</p>
+              </div>
             )}
           </div>
         )}

@@ -21,14 +21,16 @@ export const validateWord = (word) => {
  * @param {string} word - The word to validate
  * @param {string} requiredCombo - The letter combination that must be in the word
  * @param {string[]} usedWords - Array of previously used words
+ * @param {boolean} isMultiplayer - Whether this is a multiplayer game (default: false)
  * @returns {Promise<{valid: boolean, message: string}>}
  */
-export const validateWordComplete = async (word, requiredCombo, usedWords = []) => {
+export const validateWordComplete = async (word, requiredCombo, usedWords = [], isMultiplayer = false) => {
   const trimmedWord = word.trim().toLowerCase();
   
-  // Basic validation
-  if (trimmedWord.length < 3) {
-    return { valid: false, message: 'Word must be at least 3 letters!' };
+  // Basic validation - different minimums for single vs multiplayer
+  const minLength = isMultiplayer ? 4 : 3;
+  if (trimmedWord.length < minLength) {
+    return { valid: false, message: `Word must be at least ${minLength} letters!` };
   }
   
   if (!trimmedWord.includes(requiredCombo.toLowerCase())) {

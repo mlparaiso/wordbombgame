@@ -397,3 +397,79 @@ export const getLeaderboard = async (roomCode) => {
   if (error) throw error;
   return data || [];
 };
+
+/**
+ * Select a team for a player
+ * @param {string} playerId - The player ID
+ * @param {number} teamNumber - The team number to join (1, 2, 3...)
+ * @param {string} roomCode - The room code
+ */
+export const selectTeam = async (playerId, teamNumber, roomCode) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  // Get room info to check team capacity
+  const { data: room } = await supabase
+    .from('game_rooms')
+    .select('game_mode')
+    .eq('room_code', roomCode.toUpperCase())
+    .single();
+  
+  if (!room) throw new Error('Room not found');
+  
+  const teamSize = parseInt(room.game_mode.split('_')[1]);
+  
+  // Check if team is full
+  const { data: teamPlayers } = await supabase
+    .from('players')
+    .select('id')
+    .eq('room_code', roomCode.toUpperCase())
+    .eq('team_number', teamNumber)
+    .eq('is_active', true);
+  
+  if (teamPlayers && teamPlayers.length >= teamSize) {
+    throw new Error('Team is full');
+  }
+  
+  // Assign player to team
+  const { error } = await supabase
+    .from('players')
+    .update({ team_number: teamNumber })
+    .eq('id', playerId);
+  
+  if (error) throw error;
+};
+
+/**
+ * Leave current team and return to waiting area
+ * @param {string} playerId - The player ID
+ * @param {string} roomCode - The room code
+ */
+export const leaveTeam = async (playerId, roomCode) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  const { error } = await supabase
+    .from('players')
+    .update({ team_number: null })
+    .eq('id', playerId);
+  
+  if (error) throw error;
+};
+
+/**
+ * Get team capacity for a room
+ * @param {string} roomCode - The room code
+ * @returns {Promise<number>} - Team size (2, 3, or 4)
+ */
+export const getTeamCapacity = async (roomCode) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  const { data: room } = await supabase
+    .from('game_rooms')
+    .select('game_mode')
+    .eq('room_code', roomCode.toUpperCase())
+    .single();
+  
+  if (!room) throw new Error('Room not found');
+  
+  return parseInt(room.game_mode.split('_')[1]);
+};
