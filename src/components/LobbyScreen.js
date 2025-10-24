@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './LobbyScreen.css';
-import { getPlayers, subscribeToPlayers, checkRoomStatus, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
+import { getPlayers, checkRoomStatus, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
 import Chat from './Chat';
 import AdminControlPanel from './AdminControlPanel';
 
