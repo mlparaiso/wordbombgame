@@ -165,13 +165,23 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   // Timer countdown
   useEffect(() => {
     if (!gameState || showingResults || countdown > 0 || !gameStarted) {
+      console.log('Timer blocked:', { 
+        hasGameState: !!gameState, 
+        showingResults, 
+        countdown, 
+        gameStarted,
+        roundNumber: gameState?.round_number 
+      });
       return;
     }
+
+    console.log('🎮 Timer STARTED for round', gameState.round_number);
 
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         const newTime = prev - 0.1;
         if (newTime <= 0) {
+          console.log('⏰ Timer EXPIRED for round', gameState.round_number);
           clearInterval(timer);
           handleRoundEnd();
           return 0;
@@ -181,6 +191,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     }, 100);
 
     return () => {
+      console.log('🧹 Timer CLEANUP for round', gameState.round_number);
       clearInterval(timer);
     };
   }, [gameState, showingResults, countdown, gameStarted, handleRoundEnd]);
