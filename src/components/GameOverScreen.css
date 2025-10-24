@@ -17,6 +17,10 @@
   text-align: center;
 }
 
+.game-over-content.multiplayer {
+  max-width: 700px;
+}
+
 .game-over-content h2 {
   font-size: 2.5rem;
   color: #ef4444;
@@ -42,6 +46,130 @@
   font-size: 1.5rem;
 }
 
+/* Winner Announcement */
+.winner-announcement {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 16px rgba(255, 215, 0, 0.3);
+}
+
+.winner-icon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.winner-announcement h3 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin: 0.5rem 0;
+}
+
+.winner-score {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #6366f1;
+  margin: 0;
+}
+
+/* Team Rankings */
+.team-rankings,
+.player-rankings {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.team-rankings h4,
+.player-rankings h4 {
+  font-size: 1.3rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.team-rank-item,
+.player-rank-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.team-rank-item:hover,
+.player-rank-item:hover {
+  transform: translateX(4px);
+}
+
+.team-rank-item.winner,
+.player-rank-item.winner {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #fbbf24;
+}
+
+.rank-position {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #6366f1;
+  min-width: 40px;
+}
+
+.team-info {
+  flex: 1;
+  text-align: left;
+}
+
+.team-header-rank {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.team-icon-rank {
+  font-size: 1.5rem;
+}
+
+.team-name-rank {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.team-members-rank {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.team-score-rank,
+.player-score-rank {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #6366f1;
+}
+
+.player-name-rank {
+  flex: 1;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1f2937;
+  text-align: left;
+}
+
+/* Loading State */
+.loading {
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #6b7280;
+}
+
+/* Buttons */
 .difficulty-btn {
   display: block;
   width: 100%;

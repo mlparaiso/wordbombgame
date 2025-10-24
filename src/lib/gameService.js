@@ -473,3 +473,47 @@ export const getTeamCapacity = async (roomCode) => {
   
   return parseInt(room.game_mode.split('_')[1]);
 };
+
+/**
+ * Get team scores (aggregated from individual player scores)
+ * @param {string} roomCode - The room code
+ * @returns {Promise<Array>} - Array of team scores with team info
+ */
+export const getTeamScores = async (roomCode) => {
+  if (!supabase) throw new Error('Supabase not configured');
+  
+  const { data: players, error } = await supabase
+    .from('players')
+    .select('team_number, score, player_name')
+    .eq('room_code', roomCode.toUpperCase())
+    .eq('is_active', true)
+    .not('team_number', 'is', null);
+  
+  if (error) throw error;
+  
+  // Aggregate scores by team
+  const teamScores = {};
+  const teamMembers = {};
+  
+  players.forEach(player => {
+    const teamNum = player.team_number;
+    if (!teamScores[teamNum]) {
+      teamScores[teamNum] = 0;
+      teamMembers[teamNum] = [];
+    }
+    teamScores[teamNum] += player.score || 0;
+    teamMembers[teamNum].push(player.player_name);
+  });
+  
+  // Convert to array and sort by score
+  const teams = Object.entries(teamScores).map(([teamNumber, totalScore]) => ({
+    teamNumber: parseInt(teamNumber),
+    totalScore,
+    members: teamMembers[teamNumber],
+    memberCount: teamMembers[teamNumber].length
+  }));
+  
+  teams.sort((a, b) => b.totalScore - a.totalScore);
+  
+  return teams;
+};
