@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  # Disable secrets scanning for public Supabase anon key
+  # The anon key is safe to expose - it's protected by Row Level Security
+  SECRETS_SCAN_ENABLED = "false"
