@@ -125,7 +125,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [roomCode, isHost]);
+  }, [roomCode, isHost, triggerBotAnswers]);
 
   // Subscribe to player changes
   useEffect(() => {
