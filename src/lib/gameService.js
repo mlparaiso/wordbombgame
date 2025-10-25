@@ -76,15 +76,46 @@ export const createGameRoom = async (
   if (enableBots && botCount > 0) {
     const { createBotPlayer } = await import('./botService');
     const existingNames = [hostName];
+    const botIds = [];
     
     for (let i = 0; i < botCount; i++) {
       try {
-        const { botName } = await createBotPlayer(roomCode, botDifficulty, existingNames);
+        const { botId, botName } = await createBotPlayer(roomCode, botDifficulty, existingNames);
         existingNames.push(botName);
+        botIds.push(botId);
         console.log(`Created bot: ${botName}`);
       } catch (error) {
         console.error(`Failed to create bot ${i + 1}:`, error);
       }
+    }
+    
+    // Auto-assign bots to teams in team-based modes
+    if (gameMode.startsWith('team_') && botIds.length > 0) {
+      const teamSize = parseInt(gameMode.split('_')[1]);
+      const totalPlayers = 1 + botIds.length; // host + bots
+      const numberOfTeams = Math.ceil(totalPlayers / teamSize);
+      
+      // Assign host to team 1 if not spectator
+      if (!isSpectator) {
+        await supabase
+          .from('players')
+          .update({ team_number: 1 })
+          .eq('id', hostId);
+      }
+      
+      // Distribute bots evenly across teams using round-robin
+      for (let i = 0; i < botIds.length; i++) {
+        const teamNumber = isSpectator 
+          ? (i % numberOfTeams) + 1  // Start from team 1 if host is spectator
+          : ((i + 1) % numberOfTeams) + 1; // Start from team 2 if host is in team 1
+        
+        await supabase
+          .from('players')
+          .update({ team_number: teamNumber })
+          .eq('id', botIds[i]);
+      }
+      
+      console.log(`Auto-assigned ${botIds.length} bots to teams`);
     }
   }
   
