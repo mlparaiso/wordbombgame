@@ -78,15 +78,16 @@
 
 .code-label {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
   margin-right: 0.5rem;
+  font-weight: 600;
 }
 
 .code-value {
   font-size: 1.2rem;
   font-weight: bold;
   letter-spacing: 0.15em;
-  color: white;
+  color: #ffffff;
 }
 
 .player-count {

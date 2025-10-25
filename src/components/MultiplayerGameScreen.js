@@ -11,6 +11,8 @@ import {
 } from '../lib/gameService';
 import { validateWordComplete } from '../lib/wordValidation';
 import { supabase } from '../lib/supabase';
+import Chat from './Chat';
+import AdminControlPanel from './AdminControlPanel';
 
 const LETTER_COMBOS = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT',
@@ -353,70 +355,94 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   }
 
   const progressPercent = (timeLeft / (gameState.time_limit || 10)) * 100;
+  const currentPlayer = players.find(p => p.id === playerId);
+  const currentPlayerName = currentPlayer?.player_name || '';
 
   return (
-    <div className="game-screen">
-      <button className="exit-btn" onClick={onGameEnd}>
-        ← Exit
-      </button>
-
-      <div className="game-header">
-        <div className="round-info">
-          Round {gameState.round_number} / {roomSettings.max_rounds}
-        </div>
-        <div className="timer-container">
-          <div className="timer-bar" style={{ width: `${progressPercent}%` }}></div>
-          <span className="timer-text">{timeLeft.toFixed(1)}s</span>
-        </div>
-      </div>
-
-      <div className="combo-display">
-        <div className="combo-label">Find a word containing:</div>
-        <div className="combo-letters">{gameState.current_combo}</div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="word-input-form">
-        <input
-          type="text"
-          value={word}
-          onChange={(e) => setWord(e.target.value)}
-          placeholder="Type your word..."
-          className="word-input"
-          autoFocus
-          disabled={hasAnswered}
-        />
-        <button 
-          type="submit" 
-          className="submit-btn"
-          disabled={hasAnswered || !word.trim()}
-        >
-          {hasAnswered ? '✓ Answered' : 'Submit'}
+    <div className="game-screen-container">
+      <div className="game-screen-main">
+        <button className="exit-btn" onClick={onGameEnd}>
+          ← Exit
         </button>
-      </form>
 
-      {message && (
-        <div className={`message ${messageType}`}>
-          {message}
+        <div className="game-header">
+          <div className="round-info">
+            Round {gameState.round_number} / {roomSettings.max_rounds}
+          </div>
+          <div className="timer-container">
+            <div className="timer-bar" style={{ width: `${progressPercent}%` }}></div>
+            <span className="timer-text">{timeLeft.toFixed(1)}s</span>
+          </div>
         </div>
-      )}
 
-      <div className="players-scoreboard">
-        <h3>Players</h3>
-        {players
-          .sort((a, b) => b.score - a.score)
-          .map((player, idx) => {
-            const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
-            return (
-              <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}>
-                <span className="player-rank">#{idx + 1}</span>
-                <span className="player-name">
-                  {player.player_name}
-                  {playerAnswered && <span className="answered-badge">✓</span>}
-                </span>
-                <span className="player-score">{player.score}</span>
-              </div>
-            );
-          })}
+        <div className="combo-display">
+          <div className="combo-label">Find a word containing:</div>
+          <div className="combo-letters">{gameState.current_combo}</div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="word-input-form">
+          <input
+            type="text"
+            value={word}
+            onChange={(e) => setWord(e.target.value)}
+            placeholder="Type your word..."
+            className="word-input"
+            autoFocus
+            disabled={hasAnswered}
+          />
+          <button 
+            type="submit" 
+            className="submit-btn"
+            disabled={hasAnswered || !word.trim()}
+          >
+            {hasAnswered ? '✓ Answered' : 'Submit'}
+          </button>
+        </form>
+
+        {message && (
+          <div className={`message ${messageType}`}>
+            {message}
+          </div>
+        )}
+
+        <div className="players-scoreboard">
+          <h3>Players</h3>
+          {players
+            .sort((a, b) => b.score - a.score)
+            .map((player, idx) => {
+              const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
+              return (
+                <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}>
+                  <span className="player-rank">#{idx + 1}</span>
+                  <span className="player-name">
+                    {player.player_name}
+                    {playerAnswered && <span className="answered-badge">✓</span>}
+                  </span>
+                  <span className="player-score">{player.score}</span>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+
+      <div className="game-screen-sidebar">
+        {isHost && (
+          <AdminControlPanel
+            roomCode={roomCode}
+            players={players}
+            isPaused={false}
+            currentRound={gameState.round_number}
+            onEndGame={onGameEnd}
+          />
+        )}
+        
+        <div className="sidebar-chat">
+          <Chat
+            roomCode={roomCode}
+            playerId={playerId}
+            playerName={currentPlayerName}
+          />
+        </div>
       </div>
     </div>
   );
