@@ -72,6 +72,36 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     await startNextRound(roomCode, nextCombo, gameState.round_number + 1);
   }, [isHost, roomSettings, gameState, roomCode, onGameEnd]);
 
+  // Trigger bot answers for the current round
+  const triggerBotAnswers = useCallback(async (currentGameState) => {
+    try {
+      // Get all bots in the room
+      const bots = await getBotsInRoom(roomCode);
+      
+      if (bots.length === 0) return;
+      
+      console.log(`Triggering ${bots.length} bots for round ${currentGameState.round_number}`);
+      
+      // Get words already used this round
+      const existingAnswers = await getRoundAnswers(roomCode, currentGameState.round_number);
+      const usedWords = existingAnswers.map(a => a.word);
+      
+      // Trigger each bot to answer (they will answer with delays)
+      bots.forEach(bot => {
+        simulateBotAnswer(
+          roomCode,
+          bot.id,
+          currentGameState,
+          bot.bot_difficulty || 'medium',
+          usedWords,
+          currentGameState.time_limit || 10
+        );
+      });
+    } catch (error) {
+      console.error('Error triggering bot answers:', error);
+    }
+  }, [roomCode]);
+
   // Load initial data
   useEffect(() => {
     const loadData = async () => {
@@ -243,36 +273,6 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       handleNextRound();
     }
   }, [countdown, showingResults, handleNextRound]);
-
-  // Trigger bot answers for the current round
-  const triggerBotAnswers = useCallback(async (currentGameState) => {
-    try {
-      // Get all bots in the room
-      const bots = await getBotsInRoom(roomCode);
-      
-      if (bots.length === 0) return;
-      
-      console.log(`Triggering ${bots.length} bots for round ${currentGameState.round_number}`);
-      
-      // Get words already used this round
-      const existingAnswers = await getRoundAnswers(roomCode, currentGameState.round_number);
-      const usedWords = existingAnswers.map(a => a.word);
-      
-      // Trigger each bot to answer (they will answer with delays)
-      bots.forEach(bot => {
-        simulateBotAnswer(
-          roomCode,
-          bot.id,
-          currentGameState,
-          bot.bot_difficulty || 'medium',
-          usedWords,
-          currentGameState.time_limit || 10
-        );
-      });
-    } catch (error) {
-      console.error('Error triggering bot answers:', error);
-    }
-  }, [roomCode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
