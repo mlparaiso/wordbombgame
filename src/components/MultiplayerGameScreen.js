@@ -443,22 +443,83 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
         )}
 
         <div className="players-scoreboard">
-          <h3>Players</h3>
-          {players
-            .sort((a, b) => b.score - a.score)
-            .map((player, idx) => {
-              const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
-              return (
-                <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}>
-                  <span className="player-rank">#{idx + 1}</span>
-                  <span className="player-name">
-                    {player.player_name}
-                    {playerAnswered && <span className="answered-badge">✓</span>}
-                  </span>
-                  <span className="player-score">{player.score}</span>
-                </div>
-              );
-            })}
+          {roomSettings.game_mode.startsWith('team_') ? (
+            <>
+              <h3>Team Standings</h3>
+              {(() => {
+                // Group players by team and calculate team scores
+                const teams = {};
+                players.forEach(player => {
+                  if (player.team_number) {
+                    if (!teams[player.team_number]) {
+                      teams[player.team_number] = {
+                        teamNumber: player.team_number,
+                        totalScore: 0,
+                        members: []
+                      };
+                    }
+                    teams[player.team_number].totalScore += player.score || 0;
+                    teams[player.team_number].members.push(player);
+                  }
+                });
+
+                // Convert to array and sort by total score
+                const teamArray = Object.values(teams).sort((a, b) => b.totalScore - a.totalScore);
+                
+                const TEAM_COLORS = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
+                const TEAM_NAMES = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Orange'];
+
+                return teamArray.map((team, idx) => (
+                  <div key={team.teamNumber} className="team-score-section">
+                    <div className="team-score-header">
+                      <span className="team-rank">#{idx + 1}</span>
+                      <span className="team-name">
+                        {TEAM_COLORS[team.teamNumber - 1]} Team {TEAM_NAMES[team.teamNumber - 1]}
+                      </span>
+                      <span className="team-total-score">{team.totalScore}</span>
+                    </div>
+                    <div className="team-members">
+                      {team.members
+                        .sort((a, b) => b.score - a.score)
+                        .map(player => {
+                          const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
+                          return (
+                            <div key={player.id} className={`team-member-item ${player.id === playerId ? 'current-player' : ''}`}>
+                              <span className="member-name">
+                                {player.is_bot && '🤖 '}
+                                {player.player_name}
+                                {playerAnswered && <span className="answered-badge">✓</span>}
+                              </span>
+                              <span className="member-score">{player.score}</span>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                ));
+              })()}
+            </>
+          ) : (
+            <>
+              <h3>Players</h3>
+              {players
+                .sort((a, b) => b.score - a.score)
+                .map((player, idx) => {
+                  const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
+                  return (
+                    <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}>
+                      <span className="player-rank">#{idx + 1}</span>
+                      <span className="player-name">
+                        {player.is_bot && '🤖 '}
+                        {player.player_name}
+                        {playerAnswered && <span className="answered-badge">✓</span>}
+                      </span>
+                      <span className="player-score">{player.score}</span>
+                    </div>
+                  );
+                })}
+            </>
+          )}
         </div>
       </div>
 
