@@ -180,7 +180,10 @@ function App() {
     maxRounds = 10,
     livesPerPlayer = 3,
     pointsPerWord = 50,
-    isSpectator = false
+    isSpectator = false,
+    enableBots = false,
+    botCount = 2,
+    botDifficulty = 'medium'
   ) => {
     try {
       const { roomCode: newRoomCode, playerId: newPlayerId } = await createGameRoom(
@@ -190,7 +193,10 @@ function App() {
         maxRounds,
         livesPerPlayer,
         pointsPerWord,
-        isSpectator
+        isSpectator,
+        enableBots,
+        botCount,
+        botDifficulty
       );
       
       setRoomCode(newRoomCode);

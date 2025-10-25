@@ -225,10 +225,14 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
         {!isTeamMode ? (
           <div className="players-list">
             {players.map((player, index) => (
-              <div key={player.id} className={`player-card ${player.is_host ? 'host' : ''}`}>
+              <div key={player.id} className={`player-card ${player.is_host ? 'host' : ''} ${player.is_bot ? 'bot' : ''}`}>
                 <span className="player-rank">#{index + 1}</span>
-                <span className="player-name">{player.player_name}</span>
+                <span className="player-name">
+                  {player.is_bot && <span className="bot-icon">🤖 </span>}
+                  {player.player_name}
+                </span>
                 {player.is_host && <span className="host-badge">👑 Host</span>}
+                {player.is_bot && <span className="bot-badge">{player.bot_difficulty}</span>}
               </div>
             ))}
           </div>
@@ -255,8 +259,11 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
                     
                     <div className="team-players-list">
                       {teamPlayers.map(player => (
-                        <div key={player.id} className="team-player-item">
-                          <span>{player.player_name}</span>
+                        <div key={player.id} className={`team-player-item ${player.is_bot ? 'bot-player' : ''}`}>
+                          <span>
+                            {player.is_bot && <span className="bot-icon">🤖 </span>}
+                            {player.player_name}
+                          </span>
                           {player.is_host && <span className="mini-crown">👑</span>}
                         </div>
                       ))}
@@ -298,13 +305,16 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
                 </div>
                 <div className="waiting-players-list">
                   {waitingPlayers.map(player => (
-                    <div key={player.id} className="waiting-player-item">
-                      <span>{player.player_name}</span>
+                    <div key={player.id} className={`waiting-player-item ${player.is_bot ? 'bot-player' : ''}`}>
+                      <span>
+                        {player.is_bot && <span className="bot-icon">🤖 </span>}
+                        {player.player_name}
+                      </span>
                       {player.is_host && <span className="mini-crown">👑</span>}
                     </div>
                   ))}
                 </div>
-                <p className="waiting-hint">💡 Click a team above to join!</p>
+                <p className="waiting-hint">� Click a team above to join!</p>
               </div>
             )}
           </div>

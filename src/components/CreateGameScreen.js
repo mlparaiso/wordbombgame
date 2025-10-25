@@ -12,6 +12,9 @@ function CreateGameScreen({ onCreateGame, onBack }) {
   const [error, setError] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isSpectator, setIsSpectator] = useState(false);
+  const [enableBots, setEnableBots] = useState(false);
+  const [botCount, setBotCount] = useState(2);
+  const [botDifficulty, setBotDifficulty] = useState('medium');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,7 +40,10 @@ function CreateGameScreen({ onCreateGame, onBack }) {
         maxRounds,
         livesPerPlayer,
         pointsPerWord,
-        isSpectator
+        isSpectator,
+        enableBots,
+        botCount,
+        botDifficulty
       );
     } catch (err) {
       setError(err.message || 'Failed to create game');
@@ -194,6 +200,69 @@ function CreateGameScreen({ onCreateGame, onBack }) {
               {showAdvanced ? '▼' : '▶'} Advanced Settings
             </button>
           </div>
+
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={enableBots}
+                onChange={(e) => setEnableBots(e.target.checked)}
+              />
+              <span>🤖 Fill empty slots with bots</span>
+            </label>
+          </div>
+
+          {enableBots && (
+            <div className="bot-settings">
+              <div className="form-group">
+                <label>Number of Bots: {botCount}</label>
+                <input
+                  type="range"
+                  min="1"
+                  max="7"
+                  value={botCount}
+                  onChange={(e) => setBotCount(parseInt(e.target.value))}
+                  className="slider"
+                />
+                <div className="slider-labels">
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                  <span>5</span>
+                  <span>6</span>
+                  <span>7</span>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Bot Difficulty</label>
+                <div className="difficulty-options">
+                  <button
+                    type="button"
+                    className={`diff-btn easy ${botDifficulty === 'easy' ? 'active' : ''}`}
+                    onClick={() => setBotDifficulty('easy')}
+                  >
+                    Easy
+                  </button>
+                  <button
+                    type="button"
+                    className={`diff-btn medium ${botDifficulty === 'medium' ? 'active' : ''}`}
+                    onClick={() => setBotDifficulty('medium')}
+                  >
+                    Medium
+                  </button>
+                  <button
+                    type="button"
+                    className={`diff-btn hard ${botDifficulty === 'hard' ? 'active' : ''}`}
+                    onClick={() => setBotDifficulty('hard')}
+                  >
+                    Hard
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {showAdvanced && (
             <div className="advanced-settings">

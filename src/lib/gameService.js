@@ -16,6 +16,9 @@ const generateRoomCode = () => {
  * @param {number} livesPerPlayer - Lives per player (default: 3)
  * @param {number} pointsPerWord - Points awarded per word (default: 50)
  * @param {boolean} isSpectator - Whether host joins as spectator (default: false)
+ * @param {boolean} enableBots - Whether to enable bots (default: false)
+ * @param {number} botCount - Number of bots to add (default: 2)
+ * @param {string} botDifficulty - Bot difficulty level (default: 'medium')
  * @returns {Promise<{roomCode: string, playerId: string, isSpectator: boolean}>}
  */
 export const createGameRoom = async (
@@ -25,7 +28,10 @@ export const createGameRoom = async (
   maxRounds = 10,
   livesPerPlayer = 3,
   pointsPerWord = 50,
-  isSpectator = false
+  isSpectator = false,
+  enableBots = false,
+  botCount = 2,
+  botDifficulty = 'medium'
 ) => {
   if (!supabase) throw new Error('Supabase not configured');
   
@@ -43,6 +49,9 @@ export const createGameRoom = async (
       max_rounds: maxRounds,
       lives_per_player: livesPerPlayer,
       points_per_word: pointsPerWord,
+      enable_bots: enableBots,
+      bot_count: botCount,
+      bot_difficulty: botDifficulty,
       status: 'waiting'
     });
   
@@ -62,6 +71,22 @@ export const createGameRoom = async (
     });
   
   if (playerError) throw playerError;
+  
+  // Create bots if enabled
+  if (enableBots && botCount > 0) {
+    const { createBotPlayer } = await import('./botService');
+    const existingNames = [hostName];
+    
+    for (let i = 0; i < botCount; i++) {
+      try {
+        const { botName } = await createBotPlayer(roomCode, botDifficulty, existingNames);
+        existingNames.push(botName);
+        console.log(`Created bot: ${botName}`);
+      } catch (error) {
+        console.error(`Failed to create bot ${i + 1}:`, error);
+      }
+    }
+  }
   
   return { roomCode, playerId: hostId, isSpectator };
 };
