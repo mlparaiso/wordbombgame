@@ -62,6 +62,10 @@ function HomeScreen({ onPlaySolo, onCreateGame, onJoinGame }) {
             <li><FaCheckCircle className="check-icon" /> Longer words = more points</li>
           </ul>
         </div>
+
+        <div className="home-footer">
+          Created by <span className="home-footer-name">Michael Paraiso</span>
+        </div>
       </div>
     </div>
   );

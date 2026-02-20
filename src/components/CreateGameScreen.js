@@ -3,8 +3,16 @@ import './CreateGameScreen.css';
 import { FaHome, FaFistRaised, FaUsers, FaRobot, FaHeart, FaStar, FaChevronDown, FaChevronRight, FaCheckCircle, FaRegCircle } from 'react-icons/fa';
 import { GiTimeBomb } from 'react-icons/gi';
 
+const COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange', 'Pink', 'Gold', 'Silver', 'White', 'Black', 'Crimson', 'Violet', 'Teal', 'Coral', 'Amber', 'Jade', 'Ivory', 'Scarlet', 'Indigo'];
+const FRUITS = ['Lemon', 'Mango', 'Kiwi', 'Peach', 'Cherry', 'Melon', 'Grape', 'Papaya', 'Guava', 'Lychee', 'Banana', 'Coconut', 'Pineapple', 'Strawberry', 'Blueberry', 'Watermelon', 'Avocado', 'Dragonfruit', 'Passion', 'Jackfruit'];
+const randomFunnyName = () => {
+  const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const fruit = FRUITS[Math.floor(Math.random() * FRUITS.length)];
+  return `${color}${fruit}`;
+};
+
 function CreateGameScreen({ onCreateGame, onBack }) {
-  const [playerName, setPlayerName] = useState('');
+  const [playerName, setPlayerName] = useState(() => randomFunnyName());
   const [gameMode, setGameMode] = useState('vs_all');
   const [difficulty, setDifficulty] = useState('medium');
   const [maxRounds, setMaxRounds] = useState(10);

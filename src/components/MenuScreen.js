@@ -1,22 +1,23 @@
 import React from 'react';
 import './MenuScreen.css';
-import { FaArrowLeft, FaClock, FaFire, FaSnowflake } from 'react-icons/fa';
+import { FaHome, FaClock, FaFire, FaSnowflake } from 'react-icons/fa';
 import { GiTimeBomb } from 'react-icons/gi';
 
 function MenuScreen({ onStartGame, onBack }) {
   return (
     <div className="menu-screen">
+      <button className="back-home-btn" onClick={onBack}>
+        <FaHome /> Home
+      </button>
+
       <div className="menu-content">
         <div className="menu-header">
-          <button className="back-btn" onClick={onBack}>
-            <FaArrowLeft /> Back
-          </button>
+          <div className="menu-icon"><GiTimeBomb /></div>
           <h2>Solo Play</h2>
+          <p className="menu-description">
+            Type words containing the given letter combination before the bomb explodes!
+          </p>
         </div>
-
-        <p className="menu-description">
-          Type words containing the given letter combination before the bomb explodes!
-        </p>
 
         <div className="difficulty-selector">
           <h3>Select Difficulty</h3>

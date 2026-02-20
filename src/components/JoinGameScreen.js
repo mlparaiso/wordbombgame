@@ -3,8 +3,16 @@ import './JoinGameScreen.css';
 import { FaHome, FaSignInAlt, FaLightbulb, FaArrowRight } from 'react-icons/fa';
 import { GiTimeBomb } from 'react-icons/gi';
 
+const COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange', 'Pink', 'Gold', 'Silver', 'White', 'Black', 'Crimson', 'Violet', 'Teal', 'Coral', 'Amber', 'Jade', 'Ivory', 'Scarlet', 'Indigo'];
+const FRUITS = ['Lemon', 'Mango', 'Kiwi', 'Peach', 'Cherry', 'Melon', 'Grape', 'Papaya', 'Guava', 'Lychee', 'Banana', 'Coconut', 'Pineapple', 'Strawberry', 'Blueberry', 'Watermelon', 'Avocado', 'Dragonfruit', 'Passion', 'Jackfruit'];
+const randomFunnyName = () => {
+  const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const fruit = FRUITS[Math.floor(Math.random() * FRUITS.length)];
+  return `${color}${fruit}`;
+};
+
 function JoinGameScreen({ onJoinGame, onBack }) {
-  const [playerName, setPlayerName] = useState('');
+  const [playerName, setPlayerName] = useState(() => randomFunnyName());
   const [roomCode, setRoomCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

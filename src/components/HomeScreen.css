@@ -185,6 +185,19 @@
   font-size: 0.85rem;
 }
 
+/* Footer */
+.home-footer {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.home-footer-name {
+  font-weight: 600;
+  color: #6366f1;
+}
+
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
