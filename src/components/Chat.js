@@ -38,18 +38,40 @@ function Chat({ roomCode, playerId, playerName }) {
     }
   }, [roomCode]);
 
-  // Subscribe to new messages
+  // Subscribe to new messages via realtime + polling fallback
   useEffect(() => {
     if (!roomCode) return;
 
+    let latestIdRef = { current: null };
+
+    // Realtime subscription
     const subscription = subscribeToChatMessages(roomCode, (payload) => {
       if (payload.new) {
-        setMessages(prev => [...prev, payload.new]);
+        setMessages(prev => {
+          // Deduplicate by id
+          if (prev.some(m => m.id === payload.new.id)) return prev;
+          latestIdRef.current = payload.new.id;
+          return [...prev, payload.new];
+        });
       }
     });
 
+    // Polling fallback every 3 seconds to catch missed messages
+    const pollInterval = setInterval(async () => {
+      try {
+        const chatMessages = await getChatMessages(roomCode);
+        setMessages(prev => {
+          if (chatMessages.length === prev.length) return prev;
+          return chatMessages;
+        });
+      } catch (err) {
+        // ignore
+      }
+    }, 3000);
+
     return () => {
       subscription.unsubscribe();
+      clearInterval(pollInterval);
     };
   }, [roomCode]);
 

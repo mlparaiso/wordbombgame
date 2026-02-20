@@ -532,10 +532,17 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
         <button className="exit-btn" onClick={onGameEnd}>
           <FaHome /> Exit
         </button>
+        <div className="game-header-logo">
+          <GiTimeBomb style={{ fontSize: '1.3rem', color: '#a5b4fc' }} />
+          <span style={{ fontWeight: 800, color: '#ffffff', fontSize: '1rem', letterSpacing: '0.02em' }}>Word Bomb</span>
+        </div>
         <div className="game-header-center">
           <span className="header-round-info">Round {gameState.round_number} / {roomSettings.max_rounds}</span>
           <span className={`header-timer ${isUrgent ? 'urgent' : ''}`}>⏱ {timeLeft.toFixed(1)}s</span>
         </div>
+        <span style={{ fontSize: '0.78rem', color: '#a5b4fc', fontWeight: 600, whiteSpace: 'nowrap' }}>
+          Room: {roomCode}
+        </span>
       </div>
 
       {/* ── 3-Column Layout ── */}

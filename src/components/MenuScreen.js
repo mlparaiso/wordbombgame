@@ -12,7 +12,10 @@ function MenuScreen({ onStartGame, onBack }) {
 
       <div className="menu-content">
         <div className="menu-header">
-          <div className="menu-icon"><GiTimeBomb /></div>
+          <div className="menu-logo">
+            <GiTimeBomb className="menu-logo-icon" />
+            <span className="menu-logo-text">Word Bomb</span>
+          </div>
           <h2>Solo Play</h2>
           <p className="menu-description">
             Type words containing the given letter combination before the bomb explodes!

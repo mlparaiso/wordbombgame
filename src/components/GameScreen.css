@@ -12,8 +12,12 @@
 /* Multiplayer Game Screen with Sidebar Layout - Matches Lobby Layout */
 .game-screen-container {
   display: flex;
-  gap: 1.5rem;
+  flex-direction: column;
+  gap: 0;
   width: 100%;
+  height: 90vh;
+  max-height: 90vh;
+  overflow: hidden;
   animation: fadeIn 0.5s ease-in;
 }
 
@@ -865,6 +869,13 @@
   transform: none;
 }
 
+.game-header-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .game-header-center {
   flex: 1;
   display: flex;
@@ -928,6 +939,9 @@
   grid-template-columns: 240px 1fr 300px;
   gap: 12px;
   align-items: start;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Left: Scoreboard Panel */
@@ -936,9 +950,7 @@
   border-radius: 14px;
   padding: 14px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  position: sticky;
-  top: 0;
-  max-height: calc(90vh - 80px);
+  height: calc(90vh - 80px);
   overflow-y: auto;
 }
 
@@ -962,7 +974,12 @@
   flex-direction: column;
   align-items: center;
   gap: 0;
+  overflow-y: auto;
+  height: calc(90vh - 80px);
 }
+
+.game-center::-webkit-scrollbar { width: 3px; }
+.game-center::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
 
 /* Focus card: timer + combo together */
 .game-focus-card {
@@ -998,6 +1015,20 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: calc(90vh - 80px);
+  overflow: hidden;
+}
+
+.game-right-panel .sidebar-chat {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.game-right-panel .sidebar-chat .chat-container {
+  flex: 1;
+  min-height: 0;
 }
 
 /* ---- Solo Game Layout ---- */
