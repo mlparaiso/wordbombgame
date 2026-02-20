@@ -261,6 +261,11 @@ function App() {
         .from('players')
         .update({ score: 0 })
         .eq('room_code', roomCode);
+      // Reset game_state so the next game starts fresh (fixes loading bug on rejoin)
+      await supabase
+        .from('game_state')
+        .update({ round_number: 0, current_combo: '', round_start_time: null })
+        .eq('room_code', roomCode);
     } catch (error) {
       console.error('Error resetting room:', error);
     }

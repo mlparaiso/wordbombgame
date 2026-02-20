@@ -424,7 +424,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     }
   }, [gameStarted, showingResults, countdown, hasAnswered]);
 
-  if (!gameState || !roomSettings) {
+  if (!gameState || !roomSettings || !gameState.round_number) {
     return <div className="game-screen"><div className="loading-screen"><div className="loading-spinner"></div><p>Loading game...</p></div></div>;
   }
 
@@ -463,41 +463,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     );
   }
 
-  // Show countdown between rounds
-  if (showingResults && countdown > 0) {
-    return (
-      <div className="game-screen">
-        <div className="round-results">
-          <h2>Round {gameState.round_number} Complete!</h2>
-          <div className="countdown-display">
-            <p>Next round in</p>
-            <div className="countdown-number">{countdown}</div>
-          </div>
-          <div className="round-answers">
-            <h3>Answers this round:</h3>
-            {roundAnswers.map((answer, idx) => (
-              <div key={idx} className="answer-item">
-                <span className="answer-word">{answer.word}</span>
-                <span className="answer-points">+{answer.points}</span>
-              </div>
-            ))}
-          </div>
-          <div className="current-standings">
-            <h3>Current Standings:</h3>
-            {players
-              .sort((a, b) => b.score - a.score)
-              .map((player, idx) => (
-                <div key={player.id} className="standing-item">
-                  <span className="rank">#{idx + 1}</span>
-                  <span className="player-name">{player.player_name}</span>
-                  <span className="player-score">{player.score}</span>
-                </div>
-              ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // (between-round countdown is now rendered inside the main 3-col layout below)
 
   const progressPercent = (timeLeft / (gameState.time_limit || 10)) * 100;
   const isUrgent = timeLeft <= 3;
@@ -583,44 +549,70 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
           {renderScoreboard()}
         </div>
 
-        {/* CENTER: Game Zone */}
+        {/* CENTER: Game Zone OR Between-Round Countdown */}
         <div className="game-center">
-          {/* Focus Card: Timer bar + Combo */}
-          <div className="game-focus-card">
-            <div className={`timer-container ${isUrgent ? 'urgent' : ''}`}>
-              <div className="timer-bar" style={{ width: `${progressPercent}%` }}></div>
-              <span className="timer-text">{timeLeft.toFixed(1)}s</span>
+          {showingResults && countdown > 0 ? (
+            /* Between-round countdown — stays inside the 3-col layout */
+            <div className="game-focus-card" style={{textAlign:'center'}}>
+              <h2 style={{margin:'0 0 10px 0',fontSize:'1.2rem',fontWeight:700,color:'#1f2937'}}>
+                Round {gameState.round_number} Complete!
+              </h2>
+              <div className="countdown-display">
+                <p>Next round in</p>
+                <div className="countdown-number">{countdown}</div>
+              </div>
+              {roundAnswers.length > 0 && (
+                <div className="round-answers" style={{textAlign:'left',marginTop:12}}>
+                  <h3>Answers this round:</h3>
+                  {roundAnswers.map((answer, idx) => (
+                    <div key={idx} className="answer-item">
+                      <span className="answer-word">{answer.word}</span>
+                      <span className="answer-points">+{answer.points}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="combo-display">
-              <div className="combo-label">Find a word containing:</div>
-              <div className="combo-letters">{gameState.current_combo}</div>
-            </div>
-          </div>
+          ) : (
+            <>
+              {/* Focus Card: Timer bar + Combo */}
+              <div className="game-focus-card">
+                <div className={`timer-container ${isUrgent ? 'urgent' : ''}`}>
+                  <div className="timer-bar" style={{ width: `${progressPercent}%` }}></div>
+                  <span className="timer-text">{timeLeft.toFixed(1)}s</span>
+                </div>
+                <div className="combo-display">
+                  <div className="combo-label">Find a word containing:</div>
+                  <div className="combo-letters">{gameState.current_combo}</div>
+                </div>
+              </div>
 
-          {/* Word Input */}
-          <div className="game-input-zone">
-            <form onSubmit={handleSubmit} className="word-input-form">
-              <input
-                ref={wordInputRef}
-                type="text"
-                value={word}
-                onChange={(e) => setWord(e.target.value)}
-                placeholder="Type your word..."
-                className="word-input"
-                autoFocus
-                disabled={hasAnswered}
-              />
-              <button type="submit" className="submit-btn" disabled={hasAnswered || !word.trim()}>
-                {hasAnswered ? '✓ Answered' : 'Submit'}
-              </button>
-            </form>
-          </div>
+              {/* Word Input */}
+              <div className="game-input-zone">
+                <form onSubmit={handleSubmit} className="word-input-form">
+                  <input
+                    ref={wordInputRef}
+                    type="text"
+                    value={word}
+                    onChange={(e) => setWord(e.target.value)}
+                    placeholder="Type your word..."
+                    className="word-input"
+                    autoFocus
+                    disabled={hasAnswered}
+                  />
+                  <button type="submit" className="submit-btn" disabled={hasAnswered || !word.trim()}>
+                    {hasAnswered ? '✓ Answered' : 'Submit'}
+                  </button>
+                </form>
+              </div>
 
-          {/* Feedback */}
-          {message && (
-            <div className="game-feedback-zone">
-              <div className={`message ${messageType}`}>{message}</div>
-            </div>
+              {/* Feedback */}
+              {message && (
+                <div className="game-feedback-zone">
+                  <div className={`message ${messageType}`}>{message}</div>
+                </div>
+              )}
+            </>
           )}
         </div>
 

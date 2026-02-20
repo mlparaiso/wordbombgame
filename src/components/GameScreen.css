@@ -36,7 +36,7 @@
 
 .game-screen-sidebar .sidebar-chat {
   flex: 1;
-  min-height: 500px;
+  min-height: calc(90vh - 160px);
   display: flex;
 }
 
@@ -511,18 +511,18 @@
 .player-score-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 15px;
-  margin-bottom: 8px;
+  gap: 6px;
+  padding: 6px 8px;
+  margin-bottom: 5px;
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
 }
 
 .player-score-item:hover {
-  transform: translateX(4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateX(2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .player-score-item.current-player {
@@ -532,120 +532,133 @@
 }
 
 .player-rank {
-  font-size: 1.1rem;
+  font-size: 0.78rem;
   font-weight: bold;
   color: #6366f1;
-  min-width: 35px;
+  min-width: 26px;
 }
 
 .player-name {
   flex: 1;
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: #1f2937;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .answered-badge {
   display: inline-block;
   background: #10b981;
   color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  padding: 1px 5px;
+  border-radius: 10px;
+  font-size: 0.65rem;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .player-score {
-  font-size: 1.2rem;
+  font-size: 0.82rem;
   font-weight: bold;
   color: #6366f1;
-  min-width: 60px;
+  min-width: 36px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 /* Team Scoring Styles */
 .team-score-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 8px;
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .team-score-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 15px;
+  gap: 6px;
+  padding: 6px 8px;
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  border-bottom: 2px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
 }
 
 .team-rank {
-  font-size: 1.2rem;
+  font-size: 0.75rem;
   font-weight: bold;
   color: #6366f1;
-  min-width: 35px;
+  min-width: 22px;
 }
 
 .team-name {
   flex: 1;
-  font-size: 1.1rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .team-total-score {
-  font-size: 1.4rem;
+  font-size: 0.82rem;
   font-weight: bold;
   color: #6366f1;
-  min-width: 70px;
+  min-width: 36px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 .team-members {
-  padding: 10px;
+  padding: 4px 6px;
 }
 
 .team-member-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  margin-bottom: 6px;
+  gap: 5px;
+  padding: 4px 6px;
+  margin-bottom: 3px;
   background: #f9fafb;
-  border-radius: 8px;
+  border-radius: 5px;
   transition: all 0.2s ease;
 }
 
 .team-member-item:hover {
   background: #f3f4f6;
-  transform: translateX(4px);
+  transform: translateX(2px);
 }
 
 .team-member-item.current-player {
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border: 2px solid #3b82f6;
+  border: 1px solid #3b82f6;
   font-weight: 600;
 }
 
 .member-name {
   flex: 1;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   color: #374151;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .member-score {
-  font-size: 1rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #6366f1;
-  min-width: 50px;
+  min-width: 30px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 /* Round Results - styled as a card overlay */
