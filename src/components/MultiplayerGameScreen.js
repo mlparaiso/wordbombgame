@@ -52,16 +52,16 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const currentRoundRef = useRef(null);
 
   const handleRoundEnd = useCallback(async () => {
-    if (!isHost) return;
     sounds.timeout();
     setShowingResults(true);
-    setCountdown(5); // 5 second countdown
-  }, [isHost]);
+    setCountdown(5); // 5 second countdown for everyone
+  }, []);
 
   const handleNextRound = useCallback(async () => {
-    if (!isHost || !roomSettings || !gameState) return;
-
     setShowingResults(false);
+
+    // Only the host actually advances the round in the database
+    if (!isHost || !roomSettings || !gameState) return;
 
     // Check if game should end
     if (gameState.round_number >= roomSettings.max_rounds) {
