@@ -1005,20 +1005,23 @@
 .game-right-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  position: sticky;
-  top: 0;
-  max-height: calc(90vh - 80px);
+  gap: 0;
+  height: calc(100vh - 90px);
+  max-height: calc(100vh - 90px);
+  overflow: hidden;
 }
 
 .game-right-panel .sidebar-chat {
   flex: 1;
   display: flex;
-  min-height: 300px;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .game-right-panel .sidebar-chat .chat-container {
   flex: 1;
+  min-height: 0;
 }
 
 /* ---- Solo Game Layout ---- */

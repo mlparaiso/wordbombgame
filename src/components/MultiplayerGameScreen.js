@@ -177,9 +177,13 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const lastAppliedRoundRef = useRef(null);
 
   // Helper to apply a new game state (used by both realtime and polling)
+  // Only resets state when the round actually changes — never interrupts an active timer
   const applyGameState = useCallback((newState, { triggerBots = false } = {}) => {
     if (!newState) return;
-    const isNewRound = lastAppliedRoundRef.current !== newState.round_number;
+    const isNewRound = lastAppliedRoundRef.current !== null &&
+                       lastAppliedRoundRef.current !== newState.round_number;
+    const isFirstLoad = lastAppliedRoundRef.current === null;
+
     if (isNewRound) {
       lastAppliedRoundRef.current = newState.round_number;
       // Sync timer from server timestamp
@@ -196,8 +200,14 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       if (triggerBots) {
         triggerBotAnswers(newState);
       }
+      // Update gameState to trigger timer useEffect with new round number
+      setGameState(newState);
+    } else if (isFirstLoad) {
+      lastAppliedRoundRef.current = newState.round_number;
+      // Only set game state on first load — don't touch timer/results state
+      setGameState(newState);
     }
-    setGameState(newState);
+    // If same round (poll during active round) — do nothing, don't interrupt timer
   }, [triggerBotAnswers]);
 
   // Subscribe to game state changes (realtime)
