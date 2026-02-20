@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './GameScreen.css';
+import { FaHeart, FaRegHeart, FaStar, FaHome, FaPaperPlane } from 'react-icons/fa';
+import { GiTimeBomb } from 'react-icons/gi';
 
 function GameScreen({ 
   score, 
@@ -17,6 +19,8 @@ function GameScreen({
   const [feedback, setFeedback] = useState({ message: '', type: '' });
   const [shake, setShake] = useState(false);
   const inputRef = useRef(null);
+
+  const maxLives = 3;
 
   useEffect(() => {
     if (isPlaying && inputRef.current) {
@@ -60,33 +64,38 @@ function GameScreen({
   };
 
   const percentage = (timeLeft / maxTime) * 100;
-  const hearts = '❤️'.repeat(lives);
-  const emptyHearts = '🖤'.repeat(3 - lives);
+  const isUrgent = timeLeft <= 3;
 
   return (
     <div className="game-screen">
       {onExit && (
         <button className="home-btn" onClick={handleExit}>
-          🏠 Home
+          <FaHome /> Home
         </button>
       )}
 
       <div className="stats">
         <div className="stat">
-          <span className="stat-label">Score</span>
+          <span className="stat-label"><FaStar className="stat-icon score-icon" /> Score</span>
           <span className="stat-value">{score}</span>
         </div>
         <div className="stat">
-          <span className="stat-label">Round</span>
+          <span className="stat-label"><GiTimeBomb className="stat-icon bomb-icon" /> Round</span>
           <span className="stat-value">{round}</span>
         </div>
         <div className="stat">
           <span className="stat-label">Lives</span>
-          <span className="stat-value">{hearts}{emptyHearts}</span>
+          <span className="stat-value lives-display">
+            {Array.from({ length: maxLives }).map((_, i) => (
+              i < lives
+                ? <FaHeart key={i} className="heart-icon filled" />
+                : <FaRegHeart key={i} className="heart-icon empty" />
+            ))}
+          </span>
         </div>
       </div>
 
-      <div className="timer-container">
+      <div className={`timer-container ${isUrgent ? 'urgent' : ''}`}>
         <div 
           className="timer-bar" 
           style={{ width: `${percentage}%` }}
@@ -95,7 +104,7 @@ function GameScreen({
       </div>
 
       <div className="prompt-container">
-        <p className="prompt-label">Your letters:</p>
+        <p className="prompt-label">Find a word containing:</p>
         <div className="letter-combo">{currentCombo}</div>
       </div>
 
@@ -111,7 +120,9 @@ function GameScreen({
           autoComplete="off"
           spellCheck="false"
         />
-        <button onClick={handleSubmit}>Submit</button>
+        <button onClick={handleSubmit}>
+          <FaPaperPlane /> Submit
+        </button>
       </div>
 
       <div className={`feedback ${feedback.type}`}>
@@ -119,7 +130,7 @@ function GameScreen({
       </div>
 
       <div className="used-words">
-        <h4>Words Used:</h4>
+        <h4>Words Used ({usedWords.length}):</h4>
         <div className="used-words-list">
           {usedWords.map((word, index) => (
             <div key={index} className="used-word">{word}</div>

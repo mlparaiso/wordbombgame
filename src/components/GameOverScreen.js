@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './GameOverScreen.css';
 import { getTeamScores, getLeaderboard } from '../lib/gameService';
 import { sounds } from '../lib/soundService';
+import { FaTrophy, FaHome, FaRedo, FaStar, FaMedal } from 'react-icons/fa';
+import { GiTimeBomb } from 'react-icons/gi';
 
 const TEAM_COLORS = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
 const TEAM_NAMES = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Orange'];
@@ -65,17 +67,27 @@ function GameOverScreen({
     return (
       <div className="game-over-screen">
         <div className="game-over-content">
-          <h2>💥 Game Over!</h2>
+          <div className="game-over-icon solo"><GiTimeBomb /></div>
+          <h2>Game Over!</h2>
           <div className="final-stats">
-            <p>Final Score: <span>{score}</span></p>
-            <p>Rounds Completed: <span>{round}</span></p>
-            <p>Words Found: <span>{totalWords}</span></p>
+            <div className="stat-row">
+              <span className="stat-row-label"><FaStar className="stat-row-icon gold" /> Final Score</span>
+              <span className="stat-row-value">{score}</span>
+            </div>
+            <div className="stat-row">
+              <span className="stat-row-label"><GiTimeBomb className="stat-row-icon purple" /> Rounds</span>
+              <span className="stat-row-value">{round}</span>
+            </div>
+            <div className="stat-row">
+              <span className="stat-row-label"><FaMedal className="stat-row-icon bronze" /> Words Found</span>
+              <span className="stat-row-value">{totalWords}</span>
+            </div>
           </div>
           <button className="difficulty-btn" onClick={onPlayAgain}>
-            Play Again
+            <FaRedo style={{marginRight: 8}} /> Play Again
           </button>
           <button className="difficulty-btn secondary" onClick={onGoToMenu}>
-            Main Menu
+            <FaHome style={{marginRight: 8}} /> Main Menu
           </button>
         </div>
       </div>
@@ -89,7 +101,8 @@ function GameOverScreen({
     return (
       <div className="game-over-screen">
         <div className="game-over-content multiplayer">
-          <h2>🏆 Game Over!</h2>
+          <div className="game-over-icon"><FaTrophy /></div>
+          <h2>Game Over!</h2>
           
           {loading ? (
             <div className="loading">Loading results...</div>
@@ -104,13 +117,15 @@ function GameOverScreen({
               )}
 
               <div className="team-rankings">
-                <h4>📊 Final Team Rankings</h4>
+                <h4><FaMedal style={{marginRight: 6, color: '#f59e0b'}} /> Final Team Rankings</h4>
                 {teamScores.map((team, index) => (
                   <div 
                     key={team.teamNumber} 
                     className={`team-rank-item ${index === 0 ? 'winner' : ''}`}
                   >
-                    <div className="rank-position">#{index + 1}</div>
+                    <div className="rank-position">
+                      {index === 0 ? <FaTrophy style={{color: '#f59e0b'}} /> : `#${index + 1}`}
+                    </div>
                     <div className="team-info">
                       <div className="team-header-rank">
                         <span className="team-icon-rank">{TEAM_COLORS[team.teamNumber - 1]}</span>
@@ -128,7 +143,7 @@ function GameOverScreen({
           )}
 
           <button className="difficulty-btn" onClick={onGoToMenu}>
-            Back to Home
+            <FaHome style={{marginRight: 8}} /> Back to Home
           </button>
         </div>
       </div>
@@ -141,7 +156,8 @@ function GameOverScreen({
   return (
     <div className="game-over-screen">
       <div className="game-over-content multiplayer">
-        <h2>🏆 Game Over!</h2>
+        <div className="game-over-icon"><FaTrophy /></div>
+        <h2>Game Over!</h2>
         
         {loading ? (
           <div className="loading">Loading results...</div>
@@ -155,13 +171,15 @@ function GameOverScreen({
             )}
 
             <div className="player-rankings">
-              <h4>📊 Final Rankings</h4>
+              <h4><FaMedal style={{marginRight: 6, color: '#f59e0b'}} /> Final Rankings</h4>
               {playerScores.map((player, index) => (
                 <div 
                   key={player.id} 
                   className={`player-rank-item ${index === 0 ? 'winner' : ''}`}
                 >
-                  <div className="rank-position">#{index + 1}</div>
+                  <div className="rank-position">
+                    {index === 0 ? <FaTrophy style={{color: '#f59e0b'}} /> : `#${index + 1}`}
+                  </div>
                   <div className="player-name-rank">{player.player_name}</div>
                   <div className="player-score-rank">{player.score} pts</div>
                 </div>
@@ -171,7 +189,7 @@ function GameOverScreen({
         )}
 
         <button className="difficulty-btn" onClick={onGoToMenu}>
-          Back to Home
+          <FaHome style={{marginRight: 8}} /> Back to Home
         </button>
       </div>
     </div>

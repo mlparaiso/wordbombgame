@@ -1,31 +1,60 @@
 import React from 'react';
 import './MenuScreen.css';
+import { FaArrowLeft, FaClock, FaFire, FaSnowflake } from 'react-icons/fa';
+import { GiTimeBomb } from 'react-icons/gi';
 
-function MenuScreen({ onStartGame }) {
+function MenuScreen({ onStartGame, onBack }) {
   return (
     <div className="menu-screen">
       <div className="menu-content">
-        <h2>Welcome to Word Bomb!</h2>
-        <p>Type words containing the given letter combination before the timer runs out.</p>
+        <div className="menu-header">
+          <button className="back-btn" onClick={onBack}>
+            <FaArrowLeft /> Back
+          </button>
+          <h2>Solo Play</h2>
+        </div>
+
+        <p className="menu-description">
+          Type words containing the given letter combination before the bomb explodes!
+        </p>
+
         <div className="difficulty-selector">
-          <h3>Select Difficulty:</h3>
-          <button 
-            className="difficulty-btn" 
+          <h3>Select Difficulty</h3>
+
+          <button
+            className="difficulty-btn easy-btn"
             onClick={() => onStartGame('easy')}
           >
-            Easy (15s)
+            <span className="diff-icon"><FaSnowflake /></span>
+            <span className="diff-info">
+              <span className="diff-name">Easy</span>
+              <span className="diff-desc">15 seconds per round</span>
+            </span>
+            <span className="diff-badge"><FaClock /> 15s</span>
           </button>
-          <button 
-            className="difficulty-btn" 
+
+          <button
+            className="difficulty-btn medium-btn"
             onClick={() => onStartGame('medium')}
           >
-            Medium (10s)
+            <span className="diff-icon"><GiTimeBomb /></span>
+            <span className="diff-info">
+              <span className="diff-name">Medium</span>
+              <span className="diff-desc">10 seconds per round</span>
+            </span>
+            <span className="diff-badge"><FaClock /> 10s</span>
           </button>
-          <button 
-            className="difficulty-btn" 
+
+          <button
+            className="difficulty-btn hard-btn"
             onClick={() => onStartGame('hard')}
           >
-            Hard (7s)
+            <span className="diff-icon"><FaFire /></span>
+            <span className="diff-info">
+              <span className="diff-name">Hard</span>
+              <span className="diff-desc">7 seconds per round</span>
+            </span>
+            <span className="diff-badge"><FaClock /> 7s</span>
           </button>
         </div>
       </div>

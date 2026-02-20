@@ -3,6 +3,8 @@ import './LobbyScreen.css';
 import { getPlayers, checkRoomStatus, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
 import Chat from './Chat';
 import AdminControlPanel from './AdminControlPanel';
+import { FaHome, FaCrown, FaRobot } from 'react-icons/fa';
+import { GiTimeBomb } from 'react-icons/gi';
 
 const LETTER_COMBOS = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT',
@@ -209,11 +211,11 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     <div className="lobby-screen">
       <div className="lobby-main">
         <button className="home-btn" onClick={handleLeave} title="Go Home">
-          🏠
+          <FaHome /> Leave
         </button>
 
         <div className="lobby-header">
-        <h2>🎮 Game Lobby</h2>
+        <h2><GiTimeBomb style={{marginRight: 8}} />Game Lobby</h2>
         <div className="room-code-display">
           <span className="code-label">Room Code:</span>
           <span className="code-value">{roomCode}</span>
@@ -228,10 +230,10 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
               <div key={player.id} className={`player-card ${player.is_host ? 'host' : ''} ${player.is_bot ? 'bot' : ''}`}>
                 <span className="player-rank">#{index + 1}</span>
                 <span className="player-name">
-                  {player.is_bot && <span className="bot-icon">🤖 </span>}
+                  {player.is_bot && <FaRobot className="bot-icon" />}
                   {player.player_name}
                 </span>
-                {player.is_host && <span className="host-badge">👑 Host</span>}
+                {player.is_host && <span className="host-badge"><FaCrown /> Host</span>}
                 {player.is_bot && <span className="bot-badge">{player.bot_difficulty}</span>}
               </div>
             ))}
@@ -261,10 +263,10 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
                       {teamPlayers.map(player => (
                         <div key={player.id} className={`team-player-item ${player.is_bot ? 'bot-player' : ''}`}>
                           <span>
-                            {player.is_bot && <span className="bot-icon">🤖 </span>}
+                          {player.is_bot && <FaRobot className="bot-icon" />}
                             {player.player_name}
                           </span>
-                          {player.is_host && <span className="mini-crown">👑</span>}
+                          {player.is_host && <FaCrown className="mini-crown" />}
                         </div>
                       ))}
                       {[...Array(teamSize - teamPlayers.length)].map((_, i) => (

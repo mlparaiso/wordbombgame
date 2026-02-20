@@ -76,6 +76,69 @@
   }
 }
 
+/* Icon styles */
+.stat-icon {
+  font-size: 0.75rem;
+  vertical-align: middle;
+  margin-right: 3px;
+}
+
+.score-icon {
+  color: #f59e0b;
+}
+
+.bomb-icon {
+  color: #6366f1;
+}
+
+.heart-icon {
+  font-size: 1rem;
+  margin: 0 1px;
+}
+
+.heart-icon.filled {
+  color: #ef4444;
+}
+
+.heart-icon.empty {
+  color: #d1d5db;
+}
+
+.lives-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.home-btn,
+.exit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-container button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Urgent timer */
+.timer-container.urgent .timer-bar {
+  background: #ef4444;
+}
+
+.timer-container.urgent {
+  animation: urgentShake 0.4s ease-in-out infinite;
+}
+
+@keyframes urgentShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
 /* Stats */
 .stats {
   display: flex;

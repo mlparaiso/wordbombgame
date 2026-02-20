@@ -21,10 +21,67 @@
   max-width: 700px;
 }
 
+.game-over-icon {
+  font-size: 4rem;
+  color: #f59e0b;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-over-icon.solo {
+  color: #ef4444;
+  animation: bombShake 0.6s ease-in-out;
+}
+
+@keyframes bombShake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20% { transform: rotate(-15deg) scale(1.1); }
+  40% { transform: rotate(15deg) scale(1.1); }
+  60% { transform: rotate(-10deg) scale(1.05); }
+  80% { transform: rotate(10deg) scale(1.05); }
+}
+
 .game-over-content h2 {
   font-size: 2.5rem;
   color: #ef4444;
   margin-bottom: 30px;
+}
+
+/* Stat rows for solo game over */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+.stat-row-icon {
+  font-size: 0.9rem;
+}
+
+.stat-row-icon.gold { color: #f59e0b; }
+.stat-row-icon.purple { color: #6366f1; }
+.stat-row-icon.bronze { color: #b45309; }
+
+.stat-row-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #6366f1;
 }
 
 .final-stats {

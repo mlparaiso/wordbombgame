@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './GameScreen.css';
+import { FaRobot, FaCrown, FaHome } from 'react-icons/fa';
+import { GiTimeBomb } from 'react-icons/gi';
 import { 
   getPlayers, 
   subscribeToPlayers, 
@@ -415,7 +417,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     return (
       <div className="game-screen">
         <div className="round-results">
-          <h2>🎮 Get Ready!</h2>
+          <h2><GiTimeBomb style={{marginRight: 8}} /> Get Ready!</h2>
           <div className="countdown-display">
             <p>Game starts in</p>
             <div className={`countdown-number ${initialCountdown <= 3 ? 'urgent' : ''}`}>{initialCountdown}</div>
@@ -426,8 +428,8 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
               <div key={player.id} className="standing-item">
                 <span className="rank">#{idx + 1}</span>
                 <span className="player-name">
-                  {player.is_bot && '🤖 '}{player.player_name}
-                  {player.is_host && ' 👑'}
+                  {player.is_bot && <FaRobot style={{marginRight: 4}} />}{player.player_name}
+                  {player.is_host && <FaCrown style={{marginLeft: 4, color: '#f59e0b'}} />}
                 </span>
                 <span className="player-score ready-badge">Ready!</span>
               </div>
@@ -482,7 +484,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     <div className="game-screen-container">
       <div className="game-screen-main">
         <button className="exit-btn" onClick={onGameEnd}>
-          ← Exit
+          <FaHome style={{marginRight: 6}} /> Exit
         </button>
 
         <div className="game-header">

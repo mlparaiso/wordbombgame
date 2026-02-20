@@ -275,14 +275,7 @@ function App() {
 
   return (
     <div className="App">
-      <div className={`container ${screen === 'lobby' ? 'full-width' : ''}`}>
-        <header>
-          <h1>💣 Team Myk Word Bomb</h1>
-          {roomCode && (screen === 'lobby' || screen === 'multiplayer-game') && (
-            <p className="subtitle">Room Code: <strong>{roomCode}</strong></p>
-          )}
-        </header>
-
+      <div className={`container ${screen === 'lobby' || screen === 'multiplayer-game' ? 'full-width' : ''}`}>
         <main>
           {screen === 'home' && (
             <HomeScreen
@@ -293,7 +286,7 @@ function App() {
           )}
 
           {screen === 'menu' && (
-            <MenuScreen onStartGame={startGame} />
+            <MenuScreen onStartGame={startGame} onBack={() => setScreen('home')} />
           )}
 
           {screen === 'create' && (
@@ -369,9 +362,6 @@ function App() {
           )}
         </main>
 
-        <footer>
-          <p>Created with ❤️ | Deploy on Netlify</p>
-        </footer>
       </div>
     </div>
   );
