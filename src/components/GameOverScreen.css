@@ -1,3 +1,39 @@
+/* ── Word Bomb Logo (shared across all game-over variants) ── */
+.go-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.go-logo-icon {
+  font-size: 1.8rem;
+  color: #6366f1;
+}
+
+.go-logo-text {
+  font-size: 1.3rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.02em;
+}
+
+/* Light version for dark/splash backgrounds */
+.go-logo-light .go-logo-icon {
+  color: #a5b4fc;
+}
+
+.go-logo-light .go-logo-text {
+  background: linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Single-player game over layout */
 .game-over-screen {
   animation: fadeIn 0.35s ease-out;

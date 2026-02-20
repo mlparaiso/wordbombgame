@@ -88,6 +88,10 @@ function GameOverScreen({
     return (
       <div className="game-over-screen">
         <div className="game-over-content">
+          <div className="go-logo">
+            <GiTimeBomb className="go-logo-icon" />
+            <span className="go-logo-text">Word Bomb</span>
+          </div>
           <div className="game-over-icon solo"><GiTimeBomb /></div>
           <h2>Game Over!</h2>
           <div className="final-stats">
@@ -120,6 +124,10 @@ function GameOverScreen({
     return (
       <div className="mp-gameover-screen">
         <div className="mp-finish-splash">
+          <div className="go-logo go-logo-light">
+            <GiTimeBomb className="go-logo-icon" />
+            <span className="go-logo-text">Word Bomb</span>
+          </div>
           <div className="mp-finish-confetti">🎉</div>
           <h1 className="mp-finish-title">Finished!</h1>
           <p className="mp-finish-subtitle">Thank you for playing</p>
@@ -149,6 +157,10 @@ function GameOverScreen({
     return (
       <div className="mp-gameover-screen">
         <div className="mp-gameover-card">
+          <div className="go-logo">
+            <GiTimeBomb className="go-logo-icon" />
+            <span className="go-logo-text">Word Bomb</span>
+          </div>
           <div className="mp-trophy-banner">🏆</div>
           <h2 className="mp-gameover-title">Game Over!</h2>
           {winningTeam && (
@@ -194,6 +206,10 @@ function GameOverScreen({
   return (
     <div className="mp-gameover-screen">
       <div className="mp-gameover-card">
+        <div className="go-logo">
+          <GiTimeBomb className="go-logo-icon" />
+          <span className="go-logo-text">Word Bomb</span>
+        </div>
         <div className="mp-trophy-banner">🏆</div>
         <h2 className="mp-gameover-title">Game Over!</h2>
 
