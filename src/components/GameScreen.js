@@ -71,10 +71,14 @@ function GameScreen({
       {/* ── Header Bar ── */}
       <div className="game-header-bar" style={{width:'100%', maxWidth:560, alignSelf:'center', boxSizing:'border-box', marginBottom:14}}>
         {onExit && (
-          <button className="home-btn" onClick={handleExit}>
+          <button className="exit-btn" onClick={handleExit}>
             <FaHome /> Home
           </button>
         )}
+        <div className="game-header-logo">
+          <GiTimeBomb style={{ fontSize: '1.3rem', color: '#a5b4fc' }} />
+          <span style={{ fontWeight: 800, color: '#ffffff', fontSize: '1rem', letterSpacing: '0.02em' }}>Word Bomb</span>
+        </div>
         <div className="game-header-center">
           <div className="header-stats">
             <span className="header-stat">
