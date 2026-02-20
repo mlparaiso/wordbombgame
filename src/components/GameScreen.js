@@ -67,69 +67,74 @@ function GameScreen({
   const isUrgent = timeLeft <= 3;
 
   return (
-    <div className="game-screen">
-      {onExit && (
-        <button className="home-btn" onClick={handleExit}>
-          <FaHome /> Home
-        </button>
-      )}
-
-      <div className="stats">
-        <div className="stat">
-          <span className="stat-label"><FaStar className="stat-icon score-icon" /> Score</span>
-          <span className="stat-value">{score}</span>
+    <div className="game-screen solo-game-layout" style={{paddingTop: 0}}>
+      {/* ── Header Bar ── */}
+      <div className="game-header-bar" style={{width:'100%', maxWidth:560, alignSelf:'center', boxSizing:'border-box', marginBottom:14}}>
+        {onExit && (
+          <button className="home-btn" onClick={handleExit}>
+            <FaHome /> Home
+          </button>
+        )}
+        <div className="game-header-center">
+          <div className="header-stats">
+            <span className="header-stat">
+              <GiTimeBomb style={{color:'#a5b4fc'}} /> Round <span className="stat-val">{round}</span>
+            </span>
+            <span className="header-stat">
+              <FaStar style={{color:'#fbbf24'}} /> <span className="stat-val">{score}</span>
+            </span>
+            <span className="header-stat header-lives">
+              {Array.from({ length: maxLives }).map((_, i) => (
+                i < lives
+                  ? <FaHeart key={i} className="heart-icon filled" />
+                  : <FaRegHeart key={i} className="heart-icon empty" />
+              ))}
+            </span>
+          </div>
         </div>
-        <div className="stat">
-          <span className="stat-label"><GiTimeBomb className="stat-icon bomb-icon" /> Round</span>
-          <span className="stat-value">{round}</span>
+      </div>
+
+      {/* ── Focus Card: Timer + Combo ── */}
+      <div className="solo-focus-card">
+        <div className={`timer-container ${isUrgent ? 'urgent' : ''}`}>
+          <div className="timer-bar" style={{ width: `${percentage}%` }}></div>
+          <span className="timer-text">{Math.ceil(timeLeft)}</span>
         </div>
-        <div className="stat">
-          <span className="stat-label">Lives</span>
-          <span className="stat-value lives-display">
-            {Array.from({ length: maxLives }).map((_, i) => (
-              i < lives
-                ? <FaHeart key={i} className="heart-icon filled" />
-                : <FaRegHeart key={i} className="heart-icon empty" />
-            ))}
-          </span>
+        <div className="prompt-container" style={{marginBottom:0}}>
+          <p className="prompt-label">Find a word containing:</p>
+          <div className="letter-combo">{currentCombo}</div>
         </div>
       </div>
 
-      <div className={`timer-container ${isUrgent ? 'urgent' : ''}`}>
-        <div 
-          className="timer-bar" 
-          style={{ width: `${percentage}%` }}
-        ></div>
-        <span className="timer-text">{Math.ceil(timeLeft)}</span>
+      {/* ── Input ── */}
+      <div className="solo-input-zone">
+        <div className="input-container">
+          <input
+            ref={inputRef}
+            type="text"
+            className={shake ? 'shake' : ''}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type your word here..."
+            autoComplete="off"
+            spellCheck="false"
+          />
+          <button onClick={handleSubmit}>
+            <FaPaperPlane /> Submit
+          </button>
+        </div>
       </div>
 
-      <div className="prompt-container">
-        <p className="prompt-label">Find a word containing:</p>
-        <div className="letter-combo">{currentCombo}</div>
+      {/* ── Feedback ── */}
+      <div className="solo-feedback-zone">
+        <div className={`feedback ${feedback.type}`}>
+          {feedback.message}
+        </div>
       </div>
 
-      <div className="input-container">
-        <input
-          ref={inputRef}
-          type="text"
-          className={shake ? 'shake' : ''}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Type your word here..."
-          autoComplete="off"
-          spellCheck="false"
-        />
-        <button onClick={handleSubmit}>
-          <FaPaperPlane /> Submit
-        </button>
-      </div>
-
-      <div className={`feedback ${feedback.type}`}>
-        {feedback.message}
-      </div>
-
-      <div className="used-words">
+      {/* ── Used Words ── */}
+      <div className="solo-used-words used-words">
         <h4>Words Used ({usedWords.length}):</h4>
         <div className="used-words-list">
           {usedWords.map((word, index) => (

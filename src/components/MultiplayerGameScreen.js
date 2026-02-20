@@ -500,156 +500,146 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   }
 
   const progressPercent = (timeLeft / (gameState.time_limit || 10)) * 100;
+  const isUrgent = timeLeft <= 3;
   const currentPlayer = players.find(p => p.id === playerId);
   const currentPlayerName = currentPlayer?.player_name || '';
 
+  // Build scoreboard content (left panel)
+  const renderScoreboard = () => {
+    if (roomSettings.game_mode.startsWith('team_')) {
+      const teams = {};
+      players.forEach(player => {
+        if (player.team_number) {
+          if (!teams[player.team_number]) {
+            teams[player.team_number] = { teamNumber: player.team_number, totalScore: 0, members: [] };
+          }
+          teams[player.team_number].totalScore += player.score || 0;
+          teams[player.team_number].members.push(player);
+        }
+      });
+      const teamArray = Object.values(teams).sort((a, b) => b.totalScore - a.totalScore);
+      const TEAM_COLORS = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
+      const TEAM_NAMES = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Orange'];
+      return teamArray.map((team, idx) => (
+        <div key={team.teamNumber} className="team-score-section">
+          <div className="team-score-header">
+            <span className="team-rank">#{idx + 1}</span>
+            <span className="team-name">{TEAM_COLORS[team.teamNumber - 1]} Team {TEAM_NAMES[team.teamNumber - 1]}</span>
+            <span className="team-total-score">{team.totalScore}</span>
+          </div>
+          <div className="team-members">
+            {team.members.sort((a, b) => b.score - a.score).map(player => {
+              const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
+              return (
+                <div key={player.id} className={`team-member-item ${player.id === playerId ? 'current-player' : ''}`}>
+                  <span className="member-name">
+                    {player.is_bot && '🤖 '}{player.player_name}
+                    {playerAnswered && <span className="answered-badge">✓</span>}
+                  </span>
+                  <span className="member-score">{player.score}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ));
+    }
+    return players.sort((a, b) => b.score - a.score).map((player, idx) => {
+      const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
+      return (
+        <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}>
+          <span className="player-rank">#{idx + 1}</span>
+          <span className="player-name">
+            {player.is_bot && '🤖 '}{player.player_name}
+            {playerAnswered && <span className="answered-badge">✓</span>}
+          </span>
+          <span className="player-score">{player.score}</span>
+        </div>
+      );
+    });
+  };
+
   return (
-    <div className="game-screen-container">
-      <div className="game-screen-main">
+    <div className="game-screen-container" style={{flexDirection:'column'}}>
+      {/* ── Header Bar ── */}
+      <div className="game-header-bar">
         <button className="exit-btn" onClick={onGameEnd}>
-          <FaHome style={{marginRight: 6}} /> Exit
+          <FaHome /> Exit
         </button>
-
-        <div className="game-header">
-          <div className="round-info">
-            Round {gameState.round_number} / {roomSettings.max_rounds}
-          </div>
-          <div className="timer-container">
-            <div className="timer-bar" style={{ width: `${progressPercent}%` }}></div>
-            <span className="timer-text">{timeLeft.toFixed(1)}s</span>
-          </div>
-        </div>
-
-        <div className="combo-display">
-          <div className="combo-label">Find a word containing:</div>
-          <div className="combo-letters">{gameState.current_combo}</div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="word-input-form">
-          <input
-            ref={wordInputRef}
-            type="text"
-            value={word}
-            onChange={(e) => setWord(e.target.value)}
-            placeholder="Type your word..."
-            className="word-input"
-            autoFocus
-            disabled={hasAnswered}
-          />
-          <button 
-            type="submit" 
-            className="submit-btn"
-            disabled={hasAnswered || !word.trim()}
-          >
-            {hasAnswered ? '✓ Answered' : 'Submit'}
-          </button>
-        </form>
-
-        {message && (
-          <div className={`message ${messageType}`}>
-            {message}
-          </div>
-        )}
-
-        <div className="players-scoreboard">
-          {roomSettings.game_mode.startsWith('team_') ? (
-            <>
-              <h3>Team Standings</h3>
-              {(() => {
-                // Group players by team and calculate team scores
-                const teams = {};
-                players.forEach(player => {
-                  if (player.team_number) {
-                    if (!teams[player.team_number]) {
-                      teams[player.team_number] = {
-                        teamNumber: player.team_number,
-                        totalScore: 0,
-                        members: []
-                      };
-                    }
-                    teams[player.team_number].totalScore += player.score || 0;
-                    teams[player.team_number].members.push(player);
-                  }
-                });
-
-                // Convert to array and sort by total score
-                const teamArray = Object.values(teams).sort((a, b) => b.totalScore - a.totalScore);
-                
-                const TEAM_COLORS = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
-                const TEAM_NAMES = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Orange'];
-
-                return teamArray.map((team, idx) => (
-                  <div key={team.teamNumber} className="team-score-section">
-                    <div className="team-score-header">
-                      <span className="team-rank">#{idx + 1}</span>
-                      <span className="team-name">
-                        {TEAM_COLORS[team.teamNumber - 1]} Team {TEAM_NAMES[team.teamNumber - 1]}
-                      </span>
-                      <span className="team-total-score">{team.totalScore}</span>
-                    </div>
-                    <div className="team-members">
-                      {team.members
-                        .sort((a, b) => b.score - a.score)
-                        .map(player => {
-                          const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
-                          return (
-                            <div key={player.id} className={`team-member-item ${player.id === playerId ? 'current-player' : ''}`}>
-                              <span className="member-name">
-                                {player.is_bot && '🤖 '}
-                                {player.player_name}
-                                {playerAnswered && <span className="answered-badge">✓</span>}
-                              </span>
-                              <span className="member-score">{player.score}</span>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                ));
-              })()}
-            </>
-          ) : (
-            <>
-              <h3>Players</h3>
-              {players
-                .sort((a, b) => b.score - a.score)
-                .map((player, idx) => {
-                  const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
-                  return (
-                    <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}>
-                      <span className="player-rank">#{idx + 1}</span>
-                      <span className="player-name">
-                        {player.is_bot && '🤖 '}
-                        {player.player_name}
-                        {playerAnswered && <span className="answered-badge">✓</span>}
-                      </span>
-                      <span className="player-score">{player.score}</span>
-                    </div>
-                  );
-                })}
-            </>
-          )}
+        <div className="game-header-center">
+          <span className="header-round-info">Round {gameState.round_number} / {roomSettings.max_rounds}</span>
+          <span className={`header-timer ${isUrgent ? 'urgent' : ''}`}>⏱ {timeLeft.toFixed(1)}s</span>
         </div>
       </div>
 
-      <div className="game-screen-sidebar">
-        {isHost && (
-          <AdminControlPanel
-            roomCode={roomCode}
-            players={players}
-            isPaused={false}
-            currentRound={gameState.round_number}
-            onEndGame={onGameEnd}
-          />
-        )}
-        
-        <div className="sidebar-chat">
-          <Chat
-            roomCode={roomCode}
-            playerId={playerId}
-            playerName={currentPlayerName}
-          />
+      {/* ── 3-Column Layout ── */}
+      <div className="game-3col-layout">
+
+        {/* LEFT: Live Scoreboard */}
+        <div className="game-left-panel">
+          <p className="panel-title">
+            {roomSettings.game_mode.startsWith('team_') ? '🏆 Team Standings' : '🏆 Leaderboard'}
+          </p>
+          {renderScoreboard()}
         </div>
+
+        {/* CENTER: Game Zone */}
+        <div className="game-center">
+          {/* Focus Card: Timer bar + Combo */}
+          <div className="game-focus-card">
+            <div className={`timer-container ${isUrgent ? 'urgent' : ''}`}>
+              <div className="timer-bar" style={{ width: `${progressPercent}%` }}></div>
+              <span className="timer-text">{timeLeft.toFixed(1)}s</span>
+            </div>
+            <div className="combo-display">
+              <div className="combo-label">Find a word containing:</div>
+              <div className="combo-letters">{gameState.current_combo}</div>
+            </div>
+          </div>
+
+          {/* Word Input */}
+          <div className="game-input-zone">
+            <form onSubmit={handleSubmit} className="word-input-form">
+              <input
+                ref={wordInputRef}
+                type="text"
+                value={word}
+                onChange={(e) => setWord(e.target.value)}
+                placeholder="Type your word..."
+                className="word-input"
+                autoFocus
+                disabled={hasAnswered}
+              />
+              <button type="submit" className="submit-btn" disabled={hasAnswered || !word.trim()}>
+                {hasAnswered ? '✓ Answered' : 'Submit'}
+              </button>
+            </form>
+          </div>
+
+          {/* Feedback */}
+          {message && (
+            <div className="game-feedback-zone">
+              <div className={`message ${messageType}`}>{message}</div>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT: Chat + Admin */}
+        <div className="game-right-panel">
+          {isHost && (
+            <AdminControlPanel
+              roomCode={roomCode}
+              players={players}
+              isPaused={false}
+              currentRound={gameState.round_number}
+              onEndGame={onGameEnd}
+            />
+          )}
+          <div className="sidebar-chat">
+            <Chat roomCode={roomCode} playerId={playerId} playerName={currentPlayerName} />
+          </div>
+        </div>
+
       </div>
     </div>
   );

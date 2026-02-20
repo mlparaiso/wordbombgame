@@ -41,6 +41,10 @@
   width: 100%;
   max-width: 760px;
   animation: fadeIn 0.35s ease-out;
+  /* Consistent height across all pages */
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Full-width for lobby + multiplayer game (has sidebar) */
@@ -60,9 +64,14 @@ main {
   padding: 20px 24px;
   box-shadow: var(--shadow-card);
   backdrop-filter: blur(10px);
-  max-height: 92vh;
+  min-height: 90vh;
   overflow-y: auto;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex: 1;
 }
 
 /* Hide scrollbar but allow scroll */

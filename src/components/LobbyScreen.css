@@ -174,13 +174,17 @@
 }
 
 .teams-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 12px;
+  justify-content: center;
 }
 
+/* Team cards: fixed width so they wrap and center naturally */
 .team-card {
+  width: 280px;
+  flex-shrink: 0;
   background: white;
   border-radius: 10px;
   padding: 10px;
@@ -437,11 +441,10 @@
   .lobby-screen { flex-direction: column; }
   .lobby-sidebar { width: 100%; min-height: 360px; }
   .sidebar-chat { min-height: 360px; }
-  .teams-grid { grid-template-columns: repeat(2, 1fr); }
   .lobby-content { max-height: none; }
 }
 
 @media (max-width: 768px) {
-  .teams-grid { grid-template-columns: 1fr; }
+  .team-card { width: 100%; }
   .sidebar-chat { min-height: 300px; }
 }
