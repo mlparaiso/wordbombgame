@@ -58,13 +58,13 @@
 .lobby-header {
   text-align: center;
   color: #333;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   margin-top: 0;
 }
 
 .lobby-header h2 {
-  font-size: 2rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
   color: #667eea;
 }
 

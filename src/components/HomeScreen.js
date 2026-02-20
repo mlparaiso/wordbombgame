@@ -21,22 +21,28 @@ function HomeScreen({ onPlaySolo, onCreateGame, onJoinGame }) {
         <div className="menu-options">
           <button className="menu-btn solo-btn" onClick={onPlaySolo}>
             <span className="btn-icon"><FaGamepad /></span>
-            <span className="btn-text">Play Solo</span>
-            <span className="btn-desc">Practice alone</span>
+            <div className="btn-text-group">
+              <span className="btn-text">Play Solo</span>
+              <span className="btn-desc">Practice alone</span>
+            </div>
           </button>
 
           {multiplayerEnabled ? (
             <>
               <button className="menu-btn create-btn" onClick={onCreateGame}>
                 <span className="btn-icon"><FaPlusCircle /></span>
-                <span className="btn-text">Create Game</span>
-                <span className="btn-desc">Host a multiplayer room</span>
+                <div className="btn-text-group">
+                  <span className="btn-text">Create Game</span>
+                  <span className="btn-desc">Host a multiplayer room</span>
+                </div>
               </button>
 
               <button className="menu-btn join-btn" onClick={onJoinGame}>
                 <span className="btn-icon"><FaSignInAlt /></span>
-                <span className="btn-text">Join Game</span>
-                <span className="btn-desc">Enter with room code</span>
+                <div className="btn-text-group">
+                  <span className="btn-text">Join Game</span>
+                  <span className="btn-desc">Enter with room code</span>
+                </div>
               </button>
             </>
           ) : (

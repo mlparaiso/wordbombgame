@@ -9,20 +9,20 @@
 }
 
 .logo-section {
-  margin-bottom: 25px;
+  margin-bottom: 14px;
 }
 
 .logo-icon {
-  font-size: 5rem;
+  font-size: 3.5rem;
   color: #6366f1;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   animation: pulse 2s ease-in-out infinite;
   line-height: 1;
 }
 
 .game-title {
-  font-size: 2.5rem;
-  margin-bottom: 8px;
+  font-size: 2rem;
+  margin-bottom: 6px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -36,22 +36,23 @@
 }
 
 .menu-options {
-  margin-bottom: 25px;
+  margin-bottom: 14px;
 }
 
 .menu-btn {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   width: 100%;
-  padding: 18px;
-  margin: 12px 0;
+  padding: 12px 18px;
+  margin: 8px 0;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  gap: 14px;
 }
 
 .menu-btn::before {
@@ -100,19 +101,26 @@
 }
 
 .btn-icon {
-  font-size: 2.2rem;
-  margin-bottom: 8px;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.btn-text-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 }
 
 .btn-text {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: bold;
   color: white;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .btn-desc {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -135,15 +143,15 @@
 
 .game-info {
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  padding: 20px;
+  padding: 12px 16px;
   border-radius: 12px;
   text-align: left;
 }
 
 .game-info h3 {
   color: #1f2937;
-  margin-bottom: 12px;
-  font-size: 1.1rem;
+  margin-bottom: 8px;
+  font-size: 1rem;
 }
 
 .game-info ul {
@@ -153,9 +161,9 @@
 }
 
 .game-info li {
-  padding: 6px 0;
+  padding: 4px 0;
   color: #4b5563;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 8px;
