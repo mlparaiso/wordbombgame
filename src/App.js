@@ -11,6 +11,7 @@ import LobbyScreen from './components/LobbyScreen';
 import { createGameRoom, joinGameRoom, checkAndCleanupRoom } from './lib/gameService';
 import { validateWordComplete } from './lib/wordValidation';
 import { preloadDictionary } from './lib/dictionaryService';
+import { sounds } from './lib/soundService';
 
 const letterCombos = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT', 'AY',
@@ -102,9 +103,11 @@ function App() {
   const handleTimeout = useCallback(() => {
     const newLives = lives - 1;
     setLives(newLives);
+    sounds.timeout();
     
     if (newLives <= 0) {
       setIsPlaying(false);
+      sounds.gameOver();
       setScreen('gameOver');
     } else {
       setTimeout(() => {
@@ -120,12 +123,14 @@ function App() {
     const result = await validateWordComplete(word, currentCombo, usedWords);
     
     if (!result.valid) {
+      sounds.error();
       return { success: false, message: result.message };
     }
 
     // Word is valid - award points
     const trimmedWord = word.trim().toLowerCase();
     const points = Math.max(10, trimmedWord.length * 5);
+    sounds.success();
     setScore(prev => prev + points);
     setUsedWords(prev => [...prev, trimmedWord]);
     setRound(prev => prev + 1);
@@ -231,9 +236,16 @@ function App() {
 
   // Multiplayer: Game started
   const handleGameStart = () => {
+    sounds.gameStart();
     setScreen('multiplayer-game');
     setIsPlaying(true);
   };
+
+  // Multiplayer: Game ended - go to multiplayer game over screen
+  const handleMultiplayerGameEnd = useCallback(async () => {
+    setIsPlaying(false);
+    setScreen('multiplayerGameOver');
+  }, []);
 
   // Preload dictionary on app initialization
   useEffect(() => {
@@ -329,7 +341,7 @@ function App() {
               roomCode={roomCode}
               playerId={playerId}
               isHost={isHost}
-              onGameEnd={goToHome}
+              onGameEnd={handleMultiplayerGameEnd}
             />
           )}
 
@@ -340,6 +352,19 @@ function App() {
               totalWords={usedWords.length}
               onPlayAgain={playAgain}
               onGoToMenu={goToMenu}
+            />
+          )}
+
+          {screen === 'multiplayerGameOver' && (
+            <GameOverScreen
+              score={0}
+              round={0}
+              totalWords={0}
+              isMultiplayer={true}
+              roomCode={roomCode}
+              gameMode={gameMode}
+              onPlayAgain={null}
+              onGoToMenu={goToHome}
             />
           )}
         </main>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './GameOverScreen.css';
 import { getTeamScores, getLeaderboard } from '../lib/gameService';
+import { sounds } from '../lib/soundService';
 
 const TEAM_COLORS = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
 const TEAM_NAMES = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Orange'];
@@ -46,6 +47,18 @@ function GameOverScreen({
       loadScores();
     }
   }, [isMultiplayer, roomCode, loadScores]);
+
+  // Play appropriate sound on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isMultiplayer) {
+        sounds.win();
+      } else {
+        sounds.gameOver();
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []); // eslint-disable-line
 
   // Single-player mode
   if (!isMultiplayer) {

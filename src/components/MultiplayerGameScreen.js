@@ -15,6 +15,7 @@ import { supabase } from '../lib/supabase';
 import { simulateBotAnswer, getBotsInRoom } from '../lib/botService';
 import Chat from './Chat';
 import AdminControlPanel from './AdminControlPanel';
+import { sounds } from '../lib/soundService';
 
 const LETTER_COMBOS = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT',
@@ -43,14 +44,14 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const [hasAnswered, setHasAnswered] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showingResults, setShowingResults] = useState(false);
-  const [initialCountdown, setInitialCountdown] = useState(10); // 10 second countdown before Round 1
+  const [initialCountdown, setInitialCountdown] = useState(5); // 5 second countdown before Round 1
   const [gameStarted, setGameStarted] = useState(false);
   const timerRef = useRef(null);
   const currentRoundRef = useRef(null);
 
   const handleRoundEnd = useCallback(async () => {
     if (!isHost) return;
-
+    sounds.timeout();
     setShowingResults(true);
     setCountdown(5); // 5 second countdown
   }, [isHost]);
@@ -63,14 +64,15 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     // Check if game should end
     if (gameState.round_number >= roomSettings.max_rounds) {
       await endGame(roomCode);
-      onGameEnd();
+      // Let the room status poll handle navigation for all players
       return;
     }
 
     // Start next round
     const nextCombo = LETTER_COMBOS[Math.floor(Math.random() * LETTER_COMBOS.length)];
+    sounds.newRound();
     await startNextRound(roomCode, nextCombo, gameState.round_number + 1);
-  }, [isHost, roomSettings, gameState, roomCode, onGameEnd]);
+  }, [isHost, roomSettings, gameState, roomCode]);
 
   // Trigger bot answers for the current round
   const triggerBotAnswers = useCallback(async (currentGameState) => {
@@ -136,20 +138,58 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     loadData();
   }, [roomCode]);
 
+  // Poll for game/room status changes (game end detection for ALL players)
+  useEffect(() => {
+    if (!roomCode) return;
+    let active = true;
+
+    const poll = async () => {
+      if (!active) return;
+      try {
+        const { data: room } = await supabase
+          .from('game_rooms')
+          .select('status')
+          .eq('room_code', roomCode)
+          .single();
+        if (room && room.status === 'finished' && active) {
+          active = false;
+          sounds.gameOver();
+          onGameEnd();
+        }
+      } catch (e) { /* ignore */ }
+    };
+
+    const interval = setInterval(poll, 1000);
+    return () => { active = false; clearInterval(interval); };
+  }, [roomCode, onGameEnd]);
+
   // Subscribe to game state changes
   useEffect(() => {
     if (!roomCode) return;
 
     const subscription = subscribeToGameState(roomCode, async (payload) => {
       if (payload.new) {
-        setGameState(payload.new);
-        setTimeLeft(payload.new.time_limit || 10);
-        setHasAnswered(false);
-        setRoundAnswers([]);
-        
+        const newState = payload.new;
+        const prevRound = currentRoundRef.current;
+
+        // Only reset time on actual round change, not re-subscriptions
+        if (prevRound !== newState.round_number) {
+          // Compute remaining time from server round_start_time for sync accuracy
+          let syncedTime = newState.time_limit || 10;
+          if (newState.round_start_time) {
+            const elapsed = (Date.now() - new Date(newState.round_start_time).getTime()) / 1000;
+            syncedTime = Math.max(0, (newState.time_limit || 10) - elapsed);
+          }
+          setTimeLeft(syncedTime);
+          setHasAnswered(false);
+          setRoundAnswers([]);
+        }
+
+        setGameState(newState);
+
         // Trigger bots to answer when new round starts
-        if (isHost && payload.new.round_number) {
-          triggerBotAnswers(payload.new);
+        if (isHost && newState.round_number) {
+          triggerBotAnswers(newState);
         }
       }
     });
@@ -283,24 +323,38 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     
     // Check minimum length (4 letters for multiplayer)
     if (trimmedWord.length < 4) {
+      sounds.error();
       setMessage('Word must be at least 4 letters');
+      setMessageType('error');
+      setTimeout(() => setMessage(''), 2000);
+      return;
+    }
+
+    // Check if word already used this round
+    const usedThisRound = roundAnswers.map(a => a.word.toLowerCase());
+    if (usedThisRound.includes(trimmedWord)) {
+      sounds.error();
+      setMessage('That word was already used this round!');
       setMessageType('error');
       setTimeout(() => setMessage(''), 2000);
       return;
     }
     
     // Validate word
-    const result = await validateWordComplete(trimmedWord, gameState.current_combo, []);
+    const result = await validateWordComplete(trimmedWord, gameState.current_combo, usedThisRound, true);
     
     if (!result.valid) {
+      sounds.error();
       setMessage(result.message);
       setMessageType('error');
       setTimeout(() => setMessage(''), 2000);
       return;
     }
 
-    // Calculate points and time taken
-    const points = roomSettings?.points_per_word || Math.max(10, trimmedWord.length * 5);
+    // Calculate points: base points from room settings + length bonus
+    const basePoints = roomSettings?.points_per_word || 50;
+    const lengthBonus = Math.max(0, (trimmedWord.length - 4) * 5);
+    const points = basePoints + lengthBonus;
     const timeTaken = (gameState.time_limit || 10) - timeLeft;
 
     try {
@@ -313,21 +367,47 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
         timeTaken
       );
 
+      sounds.success();
       setHasAnswered(true);
       setMessage(`+${points} points! Great word!`);
       setMessageType('success');
       setWord('');
       
-      setTimeout(() => setMessage(''), 2000);
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
+      sounds.error();
       setMessage('Failed to submit answer');
       setMessageType('error');
       setTimeout(() => setMessage(''), 2000);
     }
   };
 
+  // Sound: tick on initial countdown
+  useEffect(() => {
+    if (!gameStarted && initialCountdown > 0 && initialCountdown <= 3) {
+      sounds.countdown();
+    }
+    if (!gameStarted && initialCountdown === 0) {
+      sounds.gameStart();
+    }
+  }, [initialCountdown, gameStarted]);
+
+  // Sound: urgent tick when time is low
+  useEffect(() => {
+    if (gameStarted && timeLeft > 0 && timeLeft <= 3 && !showingResults) {
+      sounds.tick();
+    }
+  }, [Math.floor(timeLeft), gameStarted, showingResults]); // eslint-disable-line
+
+  // Sound: countdown between rounds
+  useEffect(() => {
+    if (showingResults && countdown > 0 && countdown <= 3) {
+      sounds.countdown();
+    }
+  }, [countdown, showingResults]);
+
   if (!gameState || !roomSettings) {
-    return <div className="game-screen">Loading...</div>;
+    return <div className="game-screen"><div className="loading-screen"><div className="loading-spinner"></div><p>Loading game...</p></div></div>;
   }
 
   // Show initial countdown before Round 1
@@ -338,15 +418,18 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
           <h2>🎮 Get Ready!</h2>
           <div className="countdown-display">
             <p>Game starts in</p>
-            <div className="countdown-number">{initialCountdown}</div>
+            <div className={`countdown-number ${initialCountdown <= 3 ? 'urgent' : ''}`}>{initialCountdown}</div>
           </div>
           <div className="current-standings">
-            <h3>Players:</h3>
+            <h3>Players in this room:</h3>
             {players.map((player, idx) => (
               <div key={player.id} className="standing-item">
                 <span className="rank">#{idx + 1}</span>
-                <span className="player-name">{player.player_name}</span>
-                <span className="player-score">Ready!</span>
+                <span className="player-name">
+                  {player.is_bot && '🤖 '}{player.player_name}
+                  {player.is_host && ' 👑'}
+                </span>
+                <span className="player-score ready-badge">Ready!</span>
               </div>
             ))}
           </div>
