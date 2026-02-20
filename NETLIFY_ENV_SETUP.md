@@ -1,63 +1,36 @@
 # Netlify Environment Variables Setup
 
-## Critical: Supabase Credentials Missing on Netlify
+## Required Environment Variables
 
-The 406 error on your deployed site is because Netlify doesn't have the Supabase environment variables configured.
+Set these in your Netlify dashboard:
+**Site Settings → Environment Variables → Add a variable**
 
-## Steps to Fix:
+| Variable | Value |
+|---|---|
+| `REACT_APP_SUPABASE_URL` | `https://lpevhjwegdhdsyohsawo.supabase.co` |
+| `REACT_APP_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwZXZoandlZ2RoZHN5b2hzYXdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NjE1NTAsImV4cCI6MjA4NzEzNzU1MH0._B13d_KzdKKpyImqg8vn9CjPCYcc-h8SS0Q9g7YbHpo` |
 
-### 1. Go to Netlify Dashboard
-1. Visit https://app.netlify.com
-2. Select your Word Bomb project
-3. Go to **Site settings** → **Environment variables**
+## Steps
 
-### 2. Add These Environment Variables
+1. Go to https://app.netlify.com
+2. Select your **wordbombgame** site
+3. Click **Site configuration** → **Environment variables**
+4. Click **Add a variable** for each variable above
+5. After adding both, go to **Deploys** → **Trigger deploy** → **Deploy site**
 
-Click "Add a variable" and add each of these:
+## Database Setup (One-time)
 
-**Variable 1:**
-- **Key:** `REACT_APP_SUPABASE_URL`
-- **Value:** `https://vpyynbrldnatefsjqpjr.supabase.co`
-- **Scopes:** Check all (Production, Deploy Previews, Branch deploys)
+Run the SQL in `supabase_migrations/000_complete_schema.sql` in your Supabase SQL Editor:
+https://supabase.com/dashboard/project/lpevhjwegdhdsyohsawo/sql/new
 
-**Variable 2:**
-- **Key:** `REACT_APP_SUPABASE_ANON_KEY`
-- **Value:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZweXluYnJsZG5hdGVmc2pxcGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMDI5NzUsImV4cCI6MjA3Njg3ODk3NX0.1LLdlUkycXZqbVICqAZW42HK5bnAj-z2WHGMq3IADy0`
-- **Scopes:** Check all (Production, Deploy Previews, Branch deploys)
+This creates all required tables:
+- `game_rooms` - stores game room info
+- `players` - stores player data
+- `game_state` - stores current round state
+- `answers` - stores submitted words
+- `chat_messages` - stores lobby chat
 
-### 3. Trigger a Redeploy
+## Local Development
 
-After adding the environment variables:
-
-**Option A: Trigger redeploy from Netlify**
-1. Go to **Deploys** tab
-2. Click **Trigger deploy** → **Deploy site**
-
-**Option B: Push a small change**
-```bash
-git commit --allow-empty -m "Trigger Netlify redeploy with env vars"
-git push origin main
-```
-
-### 4. Verify the Fix
-
-Once redeployed:
-1. Open your deployed site
-2. Open browser DevTools (F12) → Console
-3. You should see: `Dictionary loaded: 370105 words`
-4. You should NOT see any 406 errors
-5. Try joining a game - the joiner should appear in the lobby
-
-## Why This Happened
-
-- `.env.local` files are NOT committed to Git (they're in `.gitignore`)
-- Netlify builds from Git, so it doesn't have access to your local `.env.local`
-- Environment variables must be configured separately in Netlify's dashboard
-- Without these variables, the Supabase client can't connect, causing 406 errors
-
-## Security Note
-
-The Supabase anon key is safe to expose publicly because:
-- It's protected by Row Level Security (RLS) policies
-- It only allows operations permitted by your RLS policies
-- This is the intended way to use Supabase in client-side applications
+The `.env` file is already set up with the correct credentials.
+Run `npm start` to test locally.
