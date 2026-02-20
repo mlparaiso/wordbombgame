@@ -1,10 +1,10 @@
 .join-game-screen {
-  animation: fadeSlideIn 0.3s ease-out;
+  animation: fadeIn 0.3s ease-out;
   position: relative;
-  padding-top: 48px;
+  padding-top: 38px;
 }
 
-@keyframes fadeSlideIn {
+@keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -20,9 +20,9 @@
   background: rgba(99, 102, 241, 0.9);
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 7px 14px;
   border-radius: 8px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -30,60 +30,61 @@
 }
 
 .back-home-btn:hover {
-  background: rgba(79, 70, 229, 1);
+  background: #4f46e5;
   transform: translateX(-2px);
 }
 
 /* Header */
 .join-game-header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
 }
 
 .join-game-icon {
-  font-size: 3.5rem;
+  font-size: 2.2rem;
   color: #f59e0b;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   display: flex;
   justify-content: center;
 }
 
 .join-game-content h2 {
-  font-size: 2rem;
+  font-size: 1.4rem;
   color: #1f2937;
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
+  font-weight: 700;
 }
 
 .subtitle {
   color: #6b7280;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   margin: 0;
 }
 
 /* Form sections */
 .form-section {
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .form-label {
   display: flex;
   align-items: center;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #374151;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 }
 
 .form-input {
   width: 100%;
-  padding: 14px 18px;
-  font-size: 1.05rem;
+  padding: 10px 14px;
+  font-size: 0.9rem;
   border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 10px;
   outline: none;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   box-sizing: border-box;
   background: #fafafa;
 }
@@ -97,17 +98,17 @@
 /* Room code input */
 .room-code-input {
   font-family: 'Courier New', monospace !important;
-  font-size: 1.6rem !important;
+  font-size: 1.4rem !important;
   font-weight: 700 !important;
   text-align: center;
-  letter-spacing: 10px;
+  letter-spacing: 8px;
   color: #1f2937;
   background: white !important;
 }
 
 .input-hint {
-  margin-top: 8px;
-  font-size: 0.82rem;
+  margin-top: 6px;
+  font-size: 0.75rem;
   color: #9ca3af;
   font-style: italic;
 }
@@ -116,20 +117,20 @@
 .code-slots {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-top: 14px;
+  gap: 6px;
+  margin-top: 10px;
 }
 
 .code-slot {
-  width: 44px;
-  height: 52px;
+  width: 40px;
+  height: 46px;
   border: 2px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Courier New', monospace;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #1f2937;
   background: #f9fafb;
@@ -140,52 +141,52 @@
   border-color: #f59e0b;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   color: #92400e;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
   transform: translateY(-2px);
 }
 
 /* Error */
 .error-msg {
-  padding: 12px 16px;
+  padding: 10px 14px;
   background: #fee2e2;
   border: 2px solid #ef4444;
   border-radius: 10px;
   color: #dc2626;
   font-weight: 600;
-  margin-bottom: 16px;
-  font-size: 0.9rem;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
   animation: shake 0.3s ease-in-out;
 }
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-8px); }
-  75% { transform: translateX(8px); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
 }
 
 /* Submit Button */
 .join-submit-btn {
   width: 100%;
-  padding: 16px;
-  font-size: 1.1rem;
+  padding: 12px;
+  font-size: 0.95rem;
   font-weight: 700;
   border: none;
-  border-radius: 14px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .join-submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 10px 24px rgba(245, 158, 11, 0.45);
 }
 
 .join-submit-btn:disabled {
@@ -196,25 +197,23 @@
 
 /* Tips Section */
 .join-tips {
-  margin-top: 28px;
-  padding: 20px;
+  margin-top: 14px;
+  padding: 12px 14px;
   background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
   border: 2px solid #fde68a;
-  border-radius: 14px;
+  border-radius: 10px;
 }
 
 .join-tips h4 {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: #92400e;
-  margin: 0 0 12px 0;
-  font-size: 1rem;
+  margin: 0 0 8px 0;
+  font-size: 0.88rem;
 }
 
-.tip-icon {
-  color: #f59e0b;
-}
+.tip-icon { color: #f59e0b; }
 
 .join-tips ul {
   list-style: none;
@@ -222,38 +221,25 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
 
 .join-tips li {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: #78350f;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   line-height: 1.4;
 }
 
 .tip-arrow {
   color: #f59e0b;
   flex-shrink: 0;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
-  .join-game-content h2 {
-    font-size: 1.6rem;
-  }
-
-  .code-slot {
-    width: 38px;
-    height: 46px;
-    font-size: 1.2rem;
-  }
-
-  .room-code-input {
-    font-size: 1.3rem !important;
-    letter-spacing: 6px;
-  }
+  .code-slot { width: 34px; height: 40px; font-size: 1rem; }
+  .room-code-input { font-size: 1.2rem !important; letter-spacing: 5px; }
 }

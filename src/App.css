@@ -1,84 +1,217 @@
+/* ============================================
+   GLOBAL DESIGN SYSTEM - Word Bomb
+   All screens share these base rules
+   ============================================ */
+
+/* Design tokens */
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #8b5cf6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --text-dark: #1f2937;
+  --text-mid: #4b5563;
+  --text-light: #6b7280;
+  --border: #e5e7eb;
+  --bg-light: #f9fafb;
+  --bg-mid: #f3f4f6;
+  --card-radius: 16px;
+  --inner-radius: 10px;
+  --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.2);
+  --font-title: 1.5rem;
+  --font-section: 0.9rem;
+  --font-body: 0.88rem;
+  --font-small: 0.78rem;
+}
+
+/* ============ APP SHELL ============ */
 .App {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding: 12px;
+  box-sizing: border-box;
 }
 
 .container {
   width: 100%;
-  max-width: 1280px;
-  animation: fadeIn 0.5s ease-in;
+  max-width: 760px;
+  animation: fadeIn 0.35s ease-out;
 }
 
+/* Full-width for lobby + multiplayer game (has sidebar) */
 .container.full-width {
   max-width: none;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ CARD / MAIN ============ */
+main {
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: var(--card-radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(10px);
+  max-height: 92vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Hide scrollbar but allow scroll */
+main::-webkit-scrollbar { width: 4px; }
+main::-webkit-scrollbar-track { background: transparent; }
+main::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+/* Full-width screens get no max-height cap */
+.container.full-width main {
+  max-height: none;
+  overflow-y: visible;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   color: white;
 }
 
 header h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
+  font-size: 1.8rem;
+  margin-bottom: 8px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.subtitle {
-  font-size: 1.2rem;
-  font-weight: 500;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  background: rgba(0, 0, 0, 0.2);
-  padding: 8px 16px;
-  border-radius: 8px;
-  display: inline-block;
-  margin-top: 10px;
-}
-
-main {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 16px 20px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(10px);
 }
 
 footer {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 16px;
   color: white;
   opacity: 0.8;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-/* Responsive Design */
+/* ============ SHARED BUTTON STYLE ============ */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 20px;
+  font-size: var(--font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--inner-radius);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============ SHARED SCREEN HEADER ============ */
+.screen-icon {
+  font-size: 2.2rem;
+  color: var(--primary);
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.screen-title {
+  font-size: var(--font-title);
+  color: var(--text-dark);
+  text-align: center;
+  margin: 0 0 4px 0;
+  font-weight: 700;
+}
+
+.screen-subtitle {
+  font-size: var(--font-body);
+  color: var(--text-light);
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+/* ============ SHARED FORM ============ */
+.form-label {
+  display: block;
+  font-size: var(--font-small);
+  font-weight: 700;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: var(--font-body);
+  border: 2px solid var(--border);
+  border-radius: var(--inner-radius);
+  outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+  background: #fafafa;
+  color: var(--text-dark);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* ============ BACK BUTTON ============ */
+.back-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.9);
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-home-btn:hover {
+  background: var(--primary-dark);
+  transform: translateX(-2px);
+}
+
+/* ============ RESPONSIVE ============ */
 @media (max-width: 600px) {
-  header h1 {
-    font-size: 1.5rem;
-  }
-
-  .subtitle {
-    font-size: 0.95rem;
-    padding: 6px 12px;
-  }
-
-  main {
-    padding: 20px;
+  .App { padding: 8px; }
+  main { padding: 14px 16px; max-height: 94vh; }
+  :root {
+    --font-title: 1.3rem;
+    --font-body: 0.85rem;
+    --font-small: 0.75rem;
   }
 }
