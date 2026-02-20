@@ -8,7 +8,6 @@ import { GiTimeBomb } from 'react-icons/gi';
 const TEAM_COLORS = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
 const TEAM_NAMES = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Orange'];
 
-// Trophy icons and colors for ranks
 const RANK_CONFIG = [
   { icon: '🥇', label: '1st', color: '#FFD700', bg: 'linear-gradient(135deg, #FFF9E6 0%, #FFF0B3 100%)', border: '#FFD700', shadow: 'rgba(255,215,0,0.3)' },
   { icon: '🥈', label: '2nd', color: '#C0C0C0', bg: 'linear-gradient(135deg, #F8F8F8 0%, #E8E8E8 100%)', border: '#C0C0C0', shadow: 'rgba(192,192,192,0.3)' },
@@ -23,17 +22,19 @@ function GameOverScreen({
   score, 
   round, 
   totalWords, 
-  onPlayAgain, 
+  onPlayAgain,   // solo only
   onGoToMenu,
   // Multiplayer props
   isMultiplayer = false,
   roomCode = null,
   gameMode = null,
-  isHost = false
 }) {
   const [teamScores, setTeamScores] = useState([]);
   const [playerScores, setPlayerScores] = useState([]);
   const [loading, setLoading] = useState(false);
+  // "Thank you" splash phase: true = show splash, false = show rankings
+  const [showSplash, setShowSplash] = useState(isMultiplayer);
+  const [splashCountdown, setSplashCountdown] = useState(4);
 
   const isTeamMode = gameMode && gameMode.startsWith('team_');
 
@@ -60,27 +61,16 @@ function GameOverScreen({
     }
   }, [isMultiplayer, roomCode, loadScores]);
 
-  // Non-host: poll for room reset (host clicked "Play Again")
+  // Splash countdown: 4 → 0, then reveal rankings
   useEffect(() => {
-    if (!isMultiplayer || !roomCode || isHost || !onPlayAgain) return;
-    let active = true;
-    const check = async () => {
-      try {
-        const { supabase } = await import('../lib/supabase');
-        const { data: room } = await supabase
-          .from('game_rooms')
-          .select('status')
-          .eq('room_code', roomCode)
-          .single();
-        if (room && room.status === 'waiting' && active) {
-          active = false;
-          onPlayAgain(); // navigate non-host back to lobby
-        }
-      } catch (e) { /* ignore */ }
-    };
-    const interval = setInterval(check, 1500);
-    return () => { active = false; clearInterval(interval); };
-  }, [isMultiplayer, roomCode, isHost, onPlayAgain]);
+    if (!showSplash) return;
+    if (splashCountdown <= 0) {
+      setShowSplash(false);
+      return;
+    }
+    const t = setTimeout(() => setSplashCountdown(prev => prev - 1), 1000);
+    return () => clearTimeout(t);
+  }, [showSplash, splashCountdown]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -125,7 +115,21 @@ function GameOverScreen({
     );
   }
 
-  // ── Multiplayer ─────────────────────────────────────────────
+  // ── Multiplayer: Splash screen ──────────────────────────────
+  if (showSplash) {
+    return (
+      <div className="mp-gameover-screen">
+        <div className="mp-finish-splash">
+          <div className="mp-finish-confetti">🎉</div>
+          <h1 className="mp-finish-title">Finished!</h1>
+          <p className="mp-finish-subtitle">Thank you for playing</p>
+          <p className="mp-finish-hint">Results showing in <span className="mp-finish-countdown">{splashCountdown}</span>…</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Multiplayer: Loading ────────────────────────────────────
   if (loading) {
     return (
       <div className="mp-gameover-screen">
@@ -139,7 +143,7 @@ function GameOverScreen({
     );
   }
 
-  // Team mode
+  // ── Multiplayer: Team mode rankings ────────────────────────
   if (isTeamMode) {
     const winningTeam = teamScores[0];
     return (
@@ -174,15 +178,8 @@ function GameOverScreen({
               );
             })}
           </div>
-          {roomCode && (
-            <div className="mp-room-code-badge">Room: {roomCode}</div>
-          )}
+          {roomCode && <div className="mp-room-code-badge">Room: {roomCode}</div>}
           <div className="mp-action-buttons">
-            {onPlayAgain && (
-              <button className="mp-btn mp-btn-primary" onClick={onPlayAgain}>
-                <FaRedo style={{marginRight:8}} /> Play Again (Same Room)
-              </button>
-            )}
             <button className="mp-btn mp-btn-secondary" onClick={onGoToMenu}>
               <FaHome style={{marginRight:8}} /> Back to Home
             </button>
@@ -192,7 +189,7 @@ function GameOverScreen({
     );
   }
 
-  // VS All mode
+  // ── Multiplayer: VS All rankings ───────────────────────────
   const winner = playerScores[0];
   return (
     <div className="mp-gameover-screen">
@@ -226,16 +223,9 @@ function GameOverScreen({
           })}
         </div>
 
-        {roomCode && (
-          <div className="mp-room-code-badge">Room: {roomCode}</div>
-        )}
+        {roomCode && <div className="mp-room-code-badge">Room: {roomCode}</div>}
 
         <div className="mp-action-buttons">
-          {onPlayAgain && (
-            <button className="mp-btn mp-btn-primary" onClick={onPlayAgain}>
-              <FaRedo style={{marginRight:8}} /> Play Again (Same Room)
-            </button>
-          )}
           <button className="mp-btn mp-btn-secondary" onClick={onGoToMenu}>
             <FaHome style={{marginRight:8}} /> Back to Home
           </button>
