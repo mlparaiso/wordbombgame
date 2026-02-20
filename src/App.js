@@ -235,11 +235,11 @@ function App() {
   };
 
   // Multiplayer: Game started
-  const handleGameStart = () => {
+  const handleGameStart = useCallback(() => {
     sounds.gameStart();
     setScreen('multiplayer-game');
     setIsPlaying(true);
-  };
+  }, []);
 
   // Multiplayer: Game ended - go to multiplayer game over screen
   const handleMultiplayerGameEnd = useCallback(async () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './LobbyScreen.css';
 import { getPlayers, checkRoomStatus, selectTeam, leaveTeam, startGame, sendChatMessage } from '../lib/gameService';
 import Chat from './Chat';
@@ -55,40 +55,40 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     };
   }, [roomCode, loadPlayers]);
 
+  // Ref to track whether we've already fired onGameStart to prevent double-fire
+  const gameStartedRef = useRef(false);
+  const pollIntervalRef = useRef(null);
+
   // Poll room status so joiners transition when host starts
   useEffect(() => {
     if (!roomCode) return;
 
-    console.log('LobbyScreen: Starting polling for room status:', roomCode);
-    let isActive = true;
+    // Reset the guard when this effect re-runs (new roomCode)
+    gameStartedRef.current = false;
 
     const pollRoomStatus = async () => {
-      if (!isActive) return;
-      
+      if (gameStartedRef.current) return;
       try {
         const roomData = await checkRoomStatus(roomCode);
-        console.log('LobbyScreen: Polled room status:', roomData);
-        
-        if (roomData && roomData.status === 'playing') {
-          console.log('LobbyScreen: Room status is playing, calling onGameStart()');
-          isActive = false; // Stop polling
+        if (roomData && roomData.status === 'playing' && !gameStartedRef.current) {
+          gameStartedRef.current = true;
+          clearInterval(pollIntervalRef.current);
           onGameStart();
         }
-      } catch (error) {
-        console.error('Error polling room status:', error);
+      } catch (err) {
+        console.error('Error polling room status:', err);
       }
     };
 
-    // Poll immediately
-    pollRoomStatus();
-
-    // Then poll every 250ms for near-instant updates
-    const intervalId = setInterval(pollRoomStatus, 250);
+    // 400ms initial delay so the DB 'waiting' reset from Play Again has time to commit
+    const initialDelay = setTimeout(() => {
+      pollRoomStatus();
+      pollIntervalRef.current = setInterval(pollRoomStatus, 500);
+    }, 400);
 
     return () => {
-      isActive = false;
-      clearInterval(intervalId);
-      console.log('LobbyScreen: Stopped polling for room status');
+      clearTimeout(initialDelay);
+      clearInterval(pollIntervalRef.current);
     };
   }, [roomCode, onGameStart]);
 
