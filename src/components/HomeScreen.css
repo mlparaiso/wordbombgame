@@ -19,8 +19,23 @@
   margin-bottom: 4px;
   animation: pulse 2s ease-in-out infinite;
   line-height: 1;
-  display: flex;
-  justify-content: center;
+  display: block;
+  text-align: center;
+  border: none !important;
+  outline: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0;
+  width: auto;
+}
+
+/* Ensure the SVG icon itself has no background */
+.logo-icon svg {
+  border: none !important;
+  outline: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  display: inline-block;
 }
 
 .game-title {
