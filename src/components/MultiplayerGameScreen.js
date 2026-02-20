@@ -173,39 +173,68 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     return () => { active = false; clearInterval(interval); };
   }, [roomCode, onGameEnd]);
 
-  // Subscribe to game state changes
+  // Ref to track last applied round (for polling deduplication)
+  const lastAppliedRoundRef = useRef(null);
+
+  // Helper to apply a new game state (used by both realtime and polling)
+  const applyGameState = useCallback((newState, { triggerBots = false } = {}) => {
+    if (!newState) return;
+    const isNewRound = lastAppliedRoundRef.current !== newState.round_number;
+    if (isNewRound) {
+      lastAppliedRoundRef.current = newState.round_number;
+      // Sync timer from server timestamp
+      let syncedTime = newState.time_limit || 10;
+      if (newState.round_start_time) {
+        const elapsed = (Date.now() - new Date(newState.round_start_time).getTime()) / 1000;
+        syncedTime = Math.max(0, (newState.time_limit || 10) - elapsed);
+      }
+      setTimeLeft(syncedTime);
+      setHasAnswered(false);
+      setRoundAnswers([]);
+      setShowingResults(false);
+      setCountdown(0);
+      if (triggerBots) {
+        triggerBotAnswers(newState);
+      }
+    }
+    setGameState(newState);
+  }, [triggerBotAnswers]);
+
+  // Subscribe to game state changes (realtime)
   useEffect(() => {
     if (!roomCode) return;
 
-    const subscription = subscribeToGameState(roomCode, async (payload) => {
+    const subscription = subscribeToGameState(roomCode, (payload) => {
       if (payload.new) {
-        const newState = payload.new;
-        const prevRound = currentRoundRef.current;
-
-        // Only reset time on actual round change, not re-subscriptions
-        if (prevRound !== newState.round_number) {
-          // Compute remaining time from server round_start_time for sync accuracy
-          let syncedTime = newState.time_limit || 10;
-          if (newState.round_start_time) {
-            const elapsed = (Date.now() - new Date(newState.round_start_time).getTime()) / 1000;
-            syncedTime = Math.max(0, (newState.time_limit || 10) - elapsed);
-          }
-          setTimeLeft(syncedTime);
-          setHasAnswered(false);
-          setRoundAnswers([]);
-        }
-
-        setGameState(newState);
-
-        // Trigger bots to answer when new round starts
-        if (isHost && newState.round_number) {
-          triggerBotAnswers(newState);
-        }
+        applyGameState(payload.new, { triggerBots: isHost });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [roomCode, isHost, triggerBotAnswers]);
+  }, [roomCode, isHost, applyGameState]);
+
+  // Poll game state as fallback (catches missed realtime events for non-host players)
+  useEffect(() => {
+    if (!roomCode) return;
+    let active = true;
+
+    const poll = async () => {
+      if (!active) return;
+      try {
+        const { data: state } = await supabase
+          .from('game_state')
+          .select('*')
+          .eq('room_code', roomCode)
+          .single();
+        if (state && active) {
+          applyGameState(state, { triggerBots: isHost });
+        }
+      } catch (e) { /* ignore */ }
+    };
+
+    const interval = setInterval(poll, 2000);
+    return () => { active = false; clearInterval(interval); };
+  }, [roomCode, isHost, applyGameState]);
 
   // Subscribe to player changes
   useEffect(() => {
