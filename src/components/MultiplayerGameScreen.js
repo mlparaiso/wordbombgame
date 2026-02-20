@@ -50,12 +50,20 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const [gameStarted, setGameStarted] = useState(false);
   const timerRef = useRef(null);
   const currentRoundRef = useRef(null);
+  const wordInputRef = useRef(null);
 
   const handleRoundEnd = useCallback(async () => {
     sounds.timeout();
+    // On the final round, don't show countdown - just end
+    if (gameState && roomSettings && gameState.round_number >= roomSettings.max_rounds) {
+      if (isHost) {
+        await endGame(roomCode);
+      }
+      return;
+    }
     setShowingResults(true);
     setCountdown(5); // 5 second countdown for everyone
-  }, []);
+  }, [gameState, roomSettings, isHost, roomCode]);
 
   const handleNextRound = useCallback(async () => {
     setShowingResults(false);
@@ -408,6 +416,14 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     }
   }, [countdown, showingResults]);
 
+  // Auto-focus input when game resumes after results screen
+  useEffect(() => {
+    if (gameStarted && !showingResults && countdown === 0 && !hasAnswered) {
+      const t = setTimeout(() => wordInputRef.current?.focus(), 100);
+      return () => clearTimeout(t);
+    }
+  }, [gameStarted, showingResults, countdown, hasAnswered]);
+
   if (!gameState || !roomSettings) {
     return <div className="game-screen"><div className="loading-screen"><div className="loading-spinner"></div><p>Loading game...</p></div></div>;
   }
@@ -415,15 +431,22 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   // Show initial countdown before Round 1
   if (!gameStarted && initialCountdown > 0) {
     return (
-      <div className="game-screen">
-        <div className="round-results">
-          <h2><GiTimeBomb style={{marginRight: 8}} /> Get Ready!</h2>
+      <div style={{display:'flex',alignItems:'flex-start',justifyContent:'center',minHeight:'60vh',paddingTop:'20px'}}>
+        <div className="round-results" style={{minWidth:340,maxWidth:480}}>
+          <h2 style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+            <GiTimeBomb /> Get Ready!
+          </h2>
           <div className="countdown-display">
             <p>Game starts in</p>
             <div className={`countdown-number ${initialCountdown <= 3 ? 'urgent' : ''}`}>{initialCountdown}</div>
           </div>
           <div className="current-standings">
             <h3>Players in this room:</h3>
+            {players.length === 0 && (
+              <div className="standing-item" style={{justifyContent:'center',color:'#6b7280',fontStyle:'italic'}}>
+                Loading players...
+              </div>
+            )}
             {players.map((player, idx) => (
               <div key={player.id} className="standing-item">
                 <span className="rank">#{idx + 1}</span>
@@ -431,7 +454,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
                   {player.is_bot && <FaRobot style={{marginRight: 4}} />}{player.player_name}
                   {player.is_host && <FaCrown style={{marginLeft: 4, color: '#f59e0b'}} />}
                 </span>
-                <span className="player-score ready-badge">Ready!</span>
+                <span className="ready-badge">Ready!</span>
               </div>
             ))}
           </div>
@@ -504,6 +527,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
 
         <form onSubmit={handleSubmit} className="word-input-form">
           <input
+            ref={wordInputRef}
             type="text"
             value={word}
             onChange={(e) => setWord(e.target.value)}

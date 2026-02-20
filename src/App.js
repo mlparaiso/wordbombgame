@@ -247,6 +247,27 @@ function App() {
     setScreen('multiplayerGameOver');
   }, []);
 
+  // Multiplayer: Play again in same room (reset room to waiting, go to lobby)
+  const handlePlayAgainSameRoom = useCallback(async () => {
+    try {
+      const { supabase } = await import('./lib/supabase');
+      // Reset room status to 'waiting' so all players can see the lobby again
+      await supabase
+        .from('game_rooms')
+        .update({ status: 'waiting' })
+        .eq('room_code', roomCode);
+      // Reset player scores to 0
+      await supabase
+        .from('players')
+        .update({ score: 0 })
+        .eq('room_code', roomCode);
+    } catch (error) {
+      console.error('Error resetting room:', error);
+    }
+    setIsPlaying(false);
+    setScreen('lobby');
+  }, [roomCode]);
+
   // Preload dictionary on app initialization
   useEffect(() => {
     preloadDictionary();
@@ -356,7 +377,8 @@ function App() {
               isMultiplayer={true}
               roomCode={roomCode}
               gameMode={gameMode}
-              onPlayAgain={null}
+              isHost={isHost}
+              onPlayAgain={handlePlayAgainSameRoom}
               onGoToMenu={goToHome}
             />
           )}
