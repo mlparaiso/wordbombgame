@@ -3,6 +3,8 @@ import './GameScreen.css';
 import { FaHeart, FaRegHeart, FaStar, FaHome, FaPaperPlane } from 'react-icons/fa';
 import { GiTimeBomb } from 'react-icons/gi';
 
+const MAX_SOLO_ROUNDS = 20;
+
 function GameScreen({ 
   score, 
   round, 
@@ -82,7 +84,7 @@ function GameScreen({
         <div className="game-header-center">
           <div className="header-stats">
             <span className="header-stat">
-              <GiTimeBomb style={{color:'#a5b4fc'}} /> Round <span className="stat-val">{round}</span>
+              <GiTimeBomb style={{color:'#a5b4fc'}} /> Round <span className="stat-val">{round} / {MAX_SOLO_ROUNDS}</span>
             </span>
             <span className="header-stat">
               <FaStar style={{color:'#fbbf24'}} /> <span className="stat-val">{score}</span>

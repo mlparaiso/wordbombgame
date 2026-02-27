@@ -62,8 +62,21 @@ function App() {
   const [gameMode, setGameMode] = useState('');
   const [isHost, setIsHost] = useState(false);
 
+  const MAX_SOLO_ROUNDS = 20;
+  // Track recently used combos to avoid repeats within the last N rounds
+  const recentCombosRef = React.useRef([]);
+  const RECENT_COMBO_WINDOW = 10; // don't repeat a combo within the last 10 picks
+
   const getRandomCombo = useCallback(() => {
-    return letterCombos[Math.floor(Math.random() * letterCombos.length)];
+    const recent = recentCombosRef.current;
+    // Filter out recently used combos so we don't repeat within the window
+    const available = letterCombos.filter(c => !recent.includes(c));
+    // If somehow all combos are "recent" (very small combo list), fall back to full list
+    const pool = available.length > 0 ? available : letterCombos;
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    // Update the recency window
+    recentCombosRef.current = [...recent, chosen].slice(-RECENT_COMBO_WINDOW);
+    return chosen;
   }, []);
 
   // Single-player: Start game
@@ -83,6 +96,9 @@ function App() {
         time = 10;
     }
 
+    // Reset recency window at the start of each game
+    recentCombosRef.current = [];
+
     setDifficulty(selectedDifficulty);
     setScore(0);
     setRound(1);
@@ -95,7 +111,14 @@ function App() {
     setScreen('game');
   }, [getRandomCombo]);
 
-  const startNewRound = useCallback(() => {
+  const startNewRound = useCallback((currentRound) => {
+    // End game after MAX_SOLO_ROUNDS successful answers
+    if (currentRound >= MAX_SOLO_ROUNDS) {
+      setIsPlaying(false);
+      sounds.gameOver();
+      setScreen('gameOver');
+      return;
+    }
     setCurrentCombo(getRandomCombo());
     setTimeLeft(maxTime);
   }, [getRandomCombo, maxTime]);
@@ -110,11 +133,13 @@ function App() {
       sounds.gameOver();
       setScreen('gameOver');
     } else {
+      // Timeout doesn't advance the round — same round count, new combo
       setTimeout(() => {
-        startNewRound();
+        setCurrentCombo(getRandomCombo());
+        setTimeLeft(maxTime);
       }, 1500);
     }
-  }, [lives, startNewRound]);
+  }, [lives, getRandomCombo, maxTime]);
 
   const submitWord = useCallback(async (word) => {
     if (!isPlaying) return { success: false, message: '' };
@@ -133,11 +158,14 @@ function App() {
     sounds.success();
     setScore(prev => prev + points);
     setUsedWords(prev => [...prev, trimmedWord]);
-    setRound(prev => prev + 1);
-
-    setTimeout(() => {
-      startNewRound();
-    }, 1000);
+    setRound(prev => {
+      const nextRound = prev + 1;
+      // Schedule next round start with the new round value
+      setTimeout(() => {
+        startNewRound(nextRound);
+      }, 1000);
+      return nextRound;
+    });
 
     return { success: true, message: `+${points} points! Great word!` };
   }, [isPlaying, currentCombo, usedWords, startNewRound]);

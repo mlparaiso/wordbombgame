@@ -134,15 +134,17 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     }
   };
 
+  const isTeamMode = gameMode ? gameMode.startsWith('team_') : false;
+
   const handleStartGame = async () => {
     // Check if all players are assigned to teams
-    const unassignedPlayers = players.filter(p => !p.team_number);
+    const unassignedPlayers = players.filter(p => !p.team_number && !p.is_bot);
     if (unassignedPlayers.length > 0 && isTeamMode) {
       setError(`${unassignedPlayers.length} player(s) still in waiting area`);
       return;
     }
 
-    if (players.length < 2) {
+    if (players.filter(p => !p.is_spectator).length < 2) {
       setError('Need at least 2 players to start');
       return;
     }
@@ -175,7 +177,6 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
     }
   };
 
-  const isTeamMode = gameMode.startsWith('team_');
   const teamSize = isTeamMode ? parseInt(gameMode.split('_')[1]) : 0;
 
   // Calculate number of teams dynamically
@@ -316,7 +317,7 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
                     </div>
                   ))}
                 </div>
-                <p className="waiting-hint">� Click a team above to join!</p>
+                <p className="waiting-hint">👆 Click a team above to join!</p>
               </div>
             )}
           </div>

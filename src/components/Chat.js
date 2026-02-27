@@ -42,15 +42,12 @@ function Chat({ roomCode, playerId, playerName }) {
   useEffect(() => {
     if (!roomCode) return;
 
-    let latestIdRef = { current: null };
-
     // Realtime subscription
     const subscription = subscribeToChatMessages(roomCode, (payload) => {
       if (payload.new) {
         setMessages(prev => {
           // Deduplicate by id
           if (prev.some(m => m.id === payload.new.id)) return prev;
-          latestIdRef.current = payload.new.id;
           return [...prev, payload.new];
         });
       }

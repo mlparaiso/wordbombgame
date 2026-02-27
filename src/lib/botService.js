@@ -203,8 +203,23 @@ export const simulateBotAnswer = async (
     return;
   }
   
-  // Calculate points and time taken
-  const points = Math.max(10, word.length * 5);
+  // Fetch room settings so bot uses same scoring as human players
+  let pointsPerWord = 50; // default
+  try {
+    const { data: roomData } = await supabase
+      .from('game_rooms')
+      .select('points_per_word')
+      .eq('room_code', roomCode.toUpperCase())
+      .single();
+    if (roomData?.points_per_word) {
+      pointsPerWord = roomData.points_per_word;
+    }
+  } catch (_) { /* use default */ }
+
+  // Same formula as human players: base + length bonus (per char beyond 4)
+  const basePoints = pointsPerWord;
+  const lengthBonus = Math.max(0, (word.length - 4) * 5);
+  const points = basePoints + lengthBonus;
   const timeTaken = delay / 1000; // Convert to seconds
   
   // Submit the answer

@@ -18,6 +18,8 @@ function getRankConfig(index) {
   return RANK_CONFIG[index] || { icon: `#${index + 1}`, label: `#${index + 1}`, color: '#6b7280', bg: '#f9fafb', border: '#e5e7eb', shadow: 'rgba(0,0,0,0.05)' };
 }
 
+const MAX_SOLO_ROUNDS = 20;
+
 function GameOverScreen({ 
   score, 
   round, 
@@ -85,6 +87,7 @@ function GameOverScreen({
 
   // ── Single-player ──────────────────────────────────────────
   if (!isMultiplayer) {
+    const completed = round >= MAX_SOLO_ROUNDS;
     return (
       <div className="game-over-screen">
         <div className="game-over-content">
@@ -92,8 +95,9 @@ function GameOverScreen({
             <GiTimeBomb className="go-logo-icon" />
             <span className="go-logo-text">Word Bomb</span>
           </div>
-          <div className="game-over-icon solo"><GiTimeBomb /></div>
-          <h2>Game Over!</h2>
+          <div className="game-over-icon solo">{completed ? '🎉' : <GiTimeBomb />}</div>
+          <h2>{completed ? 'Completed! 🎉' : 'Game Over!'}</h2>
+          {completed && <p style={{color:'#10b981',fontWeight:600,marginBottom:8}}>You survived all 20 rounds!</p>}
           <div className="final-stats">
             <div className="stat-row">
               <span className="stat-row-label"><FaStar className="stat-row-icon gold" /> Final Score</span>

@@ -19,6 +19,7 @@ function MenuScreen({ onStartGame, onBack }) {
           <h2>Solo Play</h2>
           <p className="menu-description">
             Type words containing the given letter combination before the bomb explodes!
+            Survive all <strong>20 rounds</strong> to complete the game.
           </p>
         </div>
 

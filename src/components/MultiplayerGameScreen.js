@@ -51,6 +51,10 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const timerRef = useRef(null);
   const currentRoundRef = useRef(null);
   const wordInputRef = useRef(null);
+  // Ref for current round number used inside subscription callback to avoid stale closure
+  const roundNumberRef = useRef(null);
+  // Stable ref for handleRoundEnd to prevent timer useEffect from re-running every time state changes
+  const handleRoundEndRef = useRef(null);
 
   const handleRoundEnd = useCallback(async () => {
     sounds.timeout();
@@ -64,6 +68,11 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     setShowingResults(true);
     setCountdown(5); // 5 second countdown for everyone
   }, [gameState, roomSettings, isHost, roomCode]);
+
+  // Keep the ref in sync with the latest handleRoundEnd
+  useEffect(() => {
+    handleRoundEndRef.current = handleRoundEnd;
+  }, [handleRoundEnd]);
 
   const handleNextRound = useCallback(async () => {
     setShowingResults(false);
@@ -258,18 +267,30 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     return () => subscription.unsubscribe();
   }, [roomCode]);
 
-  // Subscribe to answers
+  // Keep roundNumberRef in sync so the answers subscription doesn't need gameState as a dep
   useEffect(() => {
-    if (!roomCode || !gameState) return;
+    roundNumberRef.current = gameState?.round_number ?? null;
+  }, [gameState?.round_number]);
+
+  // Subscribe to answers — stable subscription that uses roundNumberRef to avoid stale closures
+  useEffect(() => {
+    if (!roomCode) return;
 
     const subscription = subscribeToAnswers(roomCode, (payload) => {
-      if (payload.new && payload.new.round_number === gameState.round_number) {
-        setRoundAnswers(prev => [...prev, payload.new]);
+      if (payload.new && payload.new.round_number === roundNumberRef.current) {
+        setRoundAnswers(prev => {
+          // Deduplicate by player_id + word
+          const isDuplicate = prev.some(
+            a => a.player_id === payload.new.player_id && a.word === payload.new.word
+          );
+          if (isDuplicate) return prev;
+          return [...prev, payload.new];
+        });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [roomCode, gameState]);
+  }, [roomCode]);
 
   // Initial countdown before Round 1
   useEffect(() => {
@@ -320,7 +341,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       
       console.log('🎮 Timer STARTED for round', gameState.round_number);
 
-      // Start new timer
+      // Start new timer — use ref so changing gameState/roomSettings doesn't reset the interval
       timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
           const newTime = prev - 0.1;
@@ -330,7 +351,8 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
               clearInterval(timerRef.current);
               timerRef.current = null;
             }
-            handleRoundEnd();
+            // Call via ref so we always use the latest handleRoundEnd without listing it as a dep
+            handleRoundEndRef.current?.();
             return 0;
           }
           return newTime;
@@ -338,16 +360,22 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       }, 100);
     }
 
+    // No cleanup return here — we intentionally do NOT clean up between re-renders.
+    // The timer is only reset when the round number changes (handled by the isNewRound block above).
+    // Cleanup on component unmount is handled separately below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState?.round_number, showingResults, countdown, gameStarted]);
+
+  // Separate cleanup effect — runs only on unmount
+  useEffect(() => {
     return () => {
-      // Only cleanup on unmount, not on every re-render
       if (timerRef.current) {
         console.log('🧹 Component unmounting, cleaning up timer');
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState?.round_number, showingResults, countdown, gameStarted, handleRoundEnd]);
+  }, []);
 
   // Countdown between rounds
   useEffect(() => {
@@ -568,7 +596,10 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     <div className="game-screen-container" style={{flexDirection:'column'}}>
       {/* ── Header Bar ── */}
       <div className="game-header-bar">
-        <button className="exit-btn" onClick={onGameEnd}>
+        <button className="exit-btn" onClick={() => {
+          const confirmed = window.confirm('Are you sure you want to exit the game?');
+          if (confirmed) onGameEnd();
+        }}>
           <FaHome /> Exit
         </button>
         <div className="game-header-logo">
