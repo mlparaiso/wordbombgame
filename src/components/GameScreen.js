@@ -79,7 +79,7 @@ function GameScreen({
   return (
     <div className="game-screen solo-game-layout" style={{paddingTop: 0}}>
       {/* ── Header Bar ── */}
-      <div className="game-header-bar" style={{width:'100%', maxWidth:560, alignSelf:'center', boxSizing:'border-box', marginBottom:14}}>
+      <div className="game-header-bar" style={{width:'100%', alignSelf:'stretch', boxSizing:'border-box', marginBottom:14}}>
         {onExit && (
           <button className="exit-btn" onClick={handleExit}>
             <FaHome /> Home
