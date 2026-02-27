@@ -141,19 +141,19 @@
   color: #6b7280;
 }
 
-/* Game Mode Grid */
+/* Game Mode Grid — 4 in a single row */
 .mode-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
 
 .mode-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 10px 8px;
+  gap: 2px;
+  padding: 8px 4px;
   background: #f9fafb;
   border: 2px solid #e5e7eb;
   border-radius: 10px;
@@ -248,11 +248,11 @@
   box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
 }
 
-/* Rounds Grid */
+/* Rounds Grid — 4 in a single row */
 .rounds-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
 
 .round-card {
@@ -260,7 +260,7 @@
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  padding: 10px;
+  padding: 8px 4px;
   border: 2px solid #e5e7eb;
   border-radius: 10px;
   background: #f9fafb;
@@ -445,7 +445,30 @@
   transform: none;
 }
 
+/* Side-by-side toggles row */
+.toggles-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.toggles-row .toggle-label {
+  margin: 0;
+  padding: 8px 10px;
+}
+
+.toggles-row .toggle-title {
+  font-size: 0.82rem;
+}
+
+.toggles-row .toggle-desc {
+  font-size: 0.7rem;
+}
+
 @media (max-width: 600px) {
   .mode-grid { grid-template-columns: 1fr 1fr; }
+  .rounds-grid { grid-template-columns: 1fr 1fr; }
   .diff-row { flex-direction: column; }
+  .toggles-row { grid-template-columns: 1fr; }
 }

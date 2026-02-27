@@ -109,18 +109,6 @@ function CreateGameScreen({ onCreateGame, onBack }) {
             />
           </div>
 
-          {/* Spectator Toggle */}
-          <div className="form-section">
-            <label className="toggle-label" onClick={() => setIsSpectator(!isSpectator)}>
-              <span className="toggle-icon">
-                {isSpectator ? <FaCheckCircle className="check-on" /> : <FaRegCircle className="check-off" />}
-              </span>
-              <span className="toggle-text">
-                <span className="toggle-title">Join as Spectator</span>
-                <span className="toggle-desc">Watch only, don't play</span>
-              </span>
-            </label>
-          </div>
 
           {/* Game Mode */}
           <div className="form-section">
@@ -176,15 +164,24 @@ function CreateGameScreen({ onCreateGame, onBack }) {
             </div>
           </div>
 
-          {/* Bots Toggle */}
-          <div className="form-section">
+          {/* Bots + Spectator Toggles side by side */}
+          <div className="toggles-row">
             <label className="toggle-label" onClick={() => setEnableBots(!enableBots)}>
               <span className="toggle-icon">
                 {enableBots ? <FaCheckCircle className="check-on" /> : <FaRegCircle className="check-off" />}
               </span>
               <span className="toggle-text">
-                <span className="toggle-title"><FaRobot style={{marginRight: 6}} />Fill empty slots with Bots</span>
-                <span className="toggle-desc">AI players will join your room</span>
+                <span className="toggle-title"><FaRobot style={{marginRight: 4}} />Fill with Bots</span>
+                <span className="toggle-desc">AI players join room</span>
+              </span>
+            </label>
+            <label className="toggle-label" onClick={() => setIsSpectator(!isSpectator)}>
+              <span className="toggle-icon">
+                {isSpectator ? <FaCheckCircle className="check-on" /> : <FaRegCircle className="check-off" />}
+              </span>
+              <span className="toggle-text">
+                <span className="toggle-title">Join as Spectator</span>
+                <span className="toggle-desc">Watch only, don't play</span>
               </span>
             </label>
           </div>
