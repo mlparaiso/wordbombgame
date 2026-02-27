@@ -125,16 +125,25 @@ function GameScreen({
         </div>
       </div>
 
-      {/* ── Focus Card: Timer + Combo ── */}
-      <div className="solo-focus-card">
+      {/* ── Timer ── */}
+      <div className="solo-timer-zone">
         <div className={`timer-container ${isUrgent ? 'urgent' : ''}`}>
           <div className="timer-bar" style={{ width: `${percentage}%` }}></div>
           <span className="timer-text">{Math.ceil(timeLeft)}</span>
         </div>
-        <div className="prompt-container" style={{marginBottom:0}}>
-          <p className="prompt-label">Find a word containing:</p>
-          <div className="letter-combo">{currentCombo}</div>
-        </div>
+      </div>
+
+      {/* ── Score Banner ── */}
+      <div className="solo-score-banner">
+        <FaStar style={{ color: '#fbbf24', fontSize: '1.1rem' }} />
+        <span className="solo-score-label">Current Score</span>
+        <span className="solo-score-value">{score}</span>
+      </div>
+
+      {/* ── Letter Combo ── */}
+      <div className="solo-combo-zone">
+        <p className="prompt-label">Find a word containing:</p>
+        <div className="letter-combo">{currentCombo}</div>
       </div>
 
       {/* ── Input ── */}
@@ -155,20 +164,10 @@ function GameScreen({
             <FaPaperPlane /> Submit
           </button>
         </div>
-      </div>
-
-      {/* ── Feedback ── */}
-      <div className="solo-feedback-zone">
-        <div className={`feedback ${feedback.type}`}>
+        {/* Inline feedback below input */}
+        <div className={`feedback ${feedback.type}`} style={{marginTop: 6, marginBottom: 0}}>
           {feedback.message}
         </div>
-      </div>
-
-      {/* ── Score Banner ── */}
-      <div className="solo-score-banner">
-        <FaStar style={{ color: '#fbbf24', fontSize: '1.1rem' }} />
-        <span className="solo-score-label">Current Score</span>
-        <span className="solo-score-value">{score}</span>
       </div>
 
       {/* ── Used Words ── */}
