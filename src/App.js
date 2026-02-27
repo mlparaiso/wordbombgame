@@ -55,6 +55,8 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(10);
   const [maxTime, setMaxTime] = useState(10);
   const [isPlaying, setIsPlaying] = useState(false);
+  // Incrementing key that restarts the timer interval after each round/life-loss
+  const [timerKey, setTimerKey] = useState(0);
 
   // Multiplayer state
   const [roomCode, setRoomCode] = useState('');
@@ -116,6 +118,7 @@ function App() {
     setUsedWords([]);
     setMaxTime(time);
     setTimeLeft(time);
+    setTimerKey(0); // reset timer key for fresh game
     setCurrentCombo(getRandomCombo());
     setIsPlaying(true);
     setScreen('game');
@@ -130,8 +133,9 @@ function App() {
       return;
     }
     setCurrentCombo(getRandomCombo());
-    setTimeLeft(maxTime);
-  }, [getRandomCombo, maxTime]);
+    setTimeLeft(maxTimeRef.current);
+    setTimerKey(k => k + 1); // restart timer interval for new round
+  }, [getRandomCombo]);
 
   // handleTimeout reads lives and maxTime from refs to avoid stale closures.
   // It is stable (no dep changes) so the timer useEffect only runs once per game start.
@@ -154,6 +158,7 @@ function App() {
           isHandlingTimeoutRef.current = false;
           setCurrentCombo(getRandomCombo());
           setTimeLeft(maxTimeRef.current);
+          setTimerKey(k => k + 1); // restart timer interval
         }, 1500);
       }
       return newLives;
@@ -320,7 +325,7 @@ function App() {
     }, 100);
 
     return () => clearInterval(timer);
-  }, [isPlaying, screen, handleTimeout]);
+  }, [isPlaying, screen, handleTimeout, timerKey]);
 
   return (
     <div className="App">
