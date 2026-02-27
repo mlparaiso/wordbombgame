@@ -164,6 +164,13 @@ function GameScreen({
         </div>
       </div>
 
+      {/* ── Score Banner ── */}
+      <div className="solo-score-banner">
+        <FaStar style={{ color: '#fbbf24', fontSize: '1.1rem' }} />
+        <span className="solo-score-label">Current Score</span>
+        <span className="solo-score-value">{score}</span>
+      </div>
+
       {/* ── Used Words ── */}
       <div className="solo-used-words used-words">
         <h4>Words Used ({usedWords.length}):</h4>
