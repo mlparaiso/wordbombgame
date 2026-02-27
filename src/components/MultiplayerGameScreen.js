@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './GameScreen.css';
-import { FaRobot, FaCrown, FaHome } from 'react-icons/fa';
+import { FaRobot, FaCrown, FaHome, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
 import { GiTimeBomb } from 'react-icons/gi';
 import { 
   getPlayers, 
@@ -17,7 +17,7 @@ import { supabase } from '../lib/supabase';
 import { simulateBotAnswer, getBotsInRoom } from '../lib/botService';
 import Chat from './Chat';
 import AdminControlPanel from './AdminControlPanel';
-import { sounds } from '../lib/soundService';
+import { sounds, getVolume, setVolume } from '../lib/soundService';
 
 const LETTER_COMBOS = [
   'AB', 'AC', 'AD', 'AG', 'AI', 'AL', 'AM', 'AN', 'AP', 'AR', 'AS', 'AT',
@@ -35,6 +35,7 @@ const LETTER_COMBOS = [
 ];
 
 function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
+  const [volume, setVolumeState] = useState(getVolume);
   const [word, setWord] = useState('');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -662,6 +663,27 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
         <span className="header-room-code">
           Room: <strong>{roomCode}</strong>
         </span>
+        {/* Volume Control */}
+        <div className="volume-control">
+          {volume === 0
+            ? <FaVolumeMute className="volume-icon" />
+            : <FaVolumeUp className="volume-icon" />
+          }
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={volume}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value);
+              setVolumeState(val);
+              setVolume(val);
+            }}
+            className="volume-slider"
+            title={`Volume: ${Math.round(volume * 100)}%`}
+          />
+        </div>
       </div>
 
       {/* ── 3-Column Layout ── */}

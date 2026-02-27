@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './GameScreen.css';
-import { FaHeart, FaRegHeart, FaStar, FaHome, FaPaperPlane } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaStar, FaHome, FaPaperPlane, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
 import { GiTimeBomb } from 'react-icons/gi';
+import { getVolume, setVolume } from '../lib/soundService';
 
 const MAX_SOLO_ROUNDS = 20;
 
@@ -20,6 +21,7 @@ function GameScreen({
   const [inputValue, setInputValue] = useState('');
   const [feedback, setFeedback] = useState({ message: '', type: '' });
   const [shake, setShake] = useState(false);
+  const [volume, setVolumeState] = useState(getVolume);
   const inputRef = useRef(null);
 
   const maxLives = 3;
@@ -34,6 +36,12 @@ function GameScreen({
     setInputValue('');
     setFeedback({ message: '', type: '' });
   }, [currentCombo]);
+
+  const handleVolumeChange = (e) => {
+    const val = parseFloat(e.target.value);
+    setVolumeState(val);
+    setVolume(val);
+  };
 
   const handleSubmit = async () => {
     if (!inputValue.trim()) return;
@@ -97,6 +105,23 @@ function GameScreen({
               ))}
             </span>
           </div>
+        </div>
+        {/* Volume Control */}
+        <div className="volume-control">
+          {volume === 0
+            ? <FaVolumeMute className="volume-icon" />
+            : <FaVolumeUp className="volume-icon" />
+          }
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={volume}
+            onChange={handleVolumeChange}
+            className="volume-slider"
+            title={`Volume: ${Math.round(volume * 100)}%`}
+          />
         </div>
       </div>
 

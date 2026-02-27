@@ -2,6 +2,16 @@
 
 let audioContext = null;
 
+// Volume control — persisted in localStorage (0.0 to 1.0)
+let masterVolume = parseFloat(localStorage.getItem('sfxVolume') ?? '0.5');
+
+export const getVolume = () => masterVolume;
+
+export const setVolume = (value) => {
+  masterVolume = Math.max(0, Math.min(1, value));
+  localStorage.setItem('sfxVolume', String(masterVolume));
+};
+
 const getAudioContext = () => {
   if (!audioContext) {
     try {
@@ -15,6 +25,7 @@ const getAudioContext = () => {
 };
 
 const playTone = (frequency, duration, type = 'sine', gain = 0.3) => {
+  if (masterVolume === 0) return; // muted — skip entirely
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -31,7 +42,10 @@ const playTone = (frequency, duration, type = 'sine', gain = 0.3) => {
 
   oscillator.type = type;
   oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
-  gainNode.gain.setValueAtTime(gain, ctx.currentTime);
+
+  // Scale gain by masterVolume
+  const scaledGain = gain * masterVolume;
+  gainNode.gain.setValueAtTime(scaledGain, ctx.currentTime);
   gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 
   oscillator.start(ctx.currentTime);
