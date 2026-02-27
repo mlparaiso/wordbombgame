@@ -226,19 +226,43 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
 
       <div className="lobby-content">
         {!isTeamMode ? (
-          <div className="players-list">
-            {/* Active players (non-spectators) */}
-            {players.filter(p => !p.is_spectator).map((player, index) => (
-              <div key={player.id} className={`player-card ${player.is_host ? 'host' : ''} ${player.is_bot ? 'bot' : ''}`}>
-                <span className="player-rank">#{index + 1}</span>
-                <span className="player-name">
-                  {player.is_bot && <FaRobot className="bot-icon" />}
-                  {player.player_name}
-                </span>
-                {player.is_host && <span className="host-badge"><FaCrown /> Host</span>}
-                {player.is_bot && <span className="bot-badge">{player.bot_difficulty}</span>}
-              </div>
-            ))}
+          <div className="players-list-wrapper">
+            {/* Active players (non-spectators) — host first, then rest in join order */}
+            <div className="players-list">
+              {[
+                ...players.filter(p => !p.is_spectator && p.is_host),
+                ...players.filter(p => !p.is_spectator && !p.is_host),
+              ].map((player, index) => {
+                const CARD_COLORS = [
+                  { bg: 'linear-gradient(135deg,#6366f1,#8b5cf6)', text: '#fff' },
+                  { bg: 'linear-gradient(135deg,#10b981,#059669)', text: '#fff' },
+                  { bg: 'linear-gradient(135deg,#f59e0b,#d97706)', text: '#fff' },
+                  { bg: 'linear-gradient(135deg,#ef4444,#dc2626)', text: '#fff' },
+                  { bg: 'linear-gradient(135deg,#3b82f6,#2563eb)', text: '#fff' },
+                  { bg: 'linear-gradient(135deg,#ec4899,#db2777)', text: '#fff' },
+                  { bg: 'linear-gradient(135deg,#14b8a6,#0d9488)', text: '#fff' },
+                  { bg: 'linear-gradient(135deg,#f97316,#ea580c)', text: '#fff' },
+                ];
+                const color = CARD_COLORS[index % CARD_COLORS.length];
+                return (
+                  <div
+                    key={player.id}
+                    className={`player-card colored-card ${player.id === playerId ? 'my-card' : ''}`}
+                    style={{ background: color.bg, color: color.text, borderColor: 'transparent' }}
+                  >
+                    <span className="player-rank" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                      {player.is_host ? <FaCrown style={{ color: '#fde68a' }} /> : `#${index + 1}`}
+                    </span>
+                    <span className="player-name" style={{ color: '#fff' }}>
+                      {player.is_bot && <FaRobot className="bot-icon" style={{ color: '#fff' }} />}
+                      {player.player_name}
+                    </span>
+                    {player.is_host && <span className="host-badge" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff' }}><FaCrown /> Host</span>}
+                    {player.is_bot && !player.is_host && <span className="bot-badge" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff' }}>{player.bot_difficulty}</span>}
+                  </div>
+                );
+              })}
+            </div>
 
             {/* Spectators section */}
             {players.some(p => p.is_spectator) && (
