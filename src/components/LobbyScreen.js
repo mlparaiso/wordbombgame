@@ -227,7 +227,8 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
       <div className="lobby-content">
         {!isTeamMode ? (
           <div className="players-list">
-            {players.map((player, index) => (
+            {/* Active players (non-spectators) */}
+            {players.filter(p => !p.is_spectator).map((player, index) => (
               <div key={player.id} className={`player-card ${player.is_host ? 'host' : ''} ${player.is_bot ? 'bot' : ''}`}>
                 <span className="player-rank">#{index + 1}</span>
                 <span className="player-name">
@@ -238,6 +239,25 @@ function LobbyScreen({ roomCode, playerId, isHost, gameMode, onGameStart, onLeav
                 {player.is_bot && <span className="bot-badge">{player.bot_difficulty}</span>}
               </div>
             ))}
+
+            {/* Spectators section */}
+            {players.some(p => p.is_spectator) && (
+              <div className="spectators-section">
+                <div className="spectators-header">
+                  <span className="spectators-icon">👁️</span>
+                  <h4>Spectators</h4>
+                  <span className="spectators-count">{players.filter(p => p.is_spectator).length}</span>
+                </div>
+                {players.filter(p => p.is_spectator).map(player => (
+                  <div key={player.id} className={`player-card spectator ${player.is_host ? 'host' : ''}`}>
+                    <span className="player-rank">👁️</span>
+                    <span className="player-name">{player.player_name}</span>
+                    {player.is_host && <span className="host-badge"><FaCrown /> Host</span>}
+                    <span className="spectator-badge">Spectator</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="team-selection-container">

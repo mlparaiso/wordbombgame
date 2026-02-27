@@ -514,7 +514,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
                 Loading players...
               </div>
             )}
-            {players.map((player, idx) => (
+            {players.filter(p => !p.is_spectator).map((player, idx) => (
               <div key={player.id} className="standing-item">
                 <span className="rank">#{idx + 1}</span>
                 <span className="player-name">
@@ -524,6 +524,21 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
                 <span className="ready-badge">Ready!</span>
               </div>
             ))}
+            {players.some(p => p.is_spectator) && (
+              <div style={{marginTop:10,paddingTop:8,borderTop:'1px solid #e5e7eb'}}>
+                <p style={{fontSize:'0.75rem',color:'#9ca3af',fontWeight:700,margin:'0 0 6px 0'}}>👁️ Spectators</p>
+                {players.filter(p => p.is_spectator).map(player => (
+                  <div key={player.id} className="standing-item" style={{opacity:0.7}}>
+                    <span className="rank">👁️</span>
+                    <span className="player-name">
+                      {player.player_name}
+                      {player.is_host && <FaCrown style={{marginLeft: 4, color: '#f59e0b'}} />}
+                    </span>
+                    <span style={{fontSize:'0.75rem',color:'#9ca3af'}}>Spectator</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -537,11 +552,16 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const currentPlayer = players.find(p => p.id === playerId);
   const currentPlayerName = currentPlayer?.player_name || '';
 
-  // Build scoreboard content (left panel)
+  // Separate spectators from active players
+  const activePlayers = players.filter(p => !p.is_spectator);
+  const spectators = players.filter(p => p.is_spectator);
+  const isSpectator = currentPlayer?.is_spectator === true;
+
+  // Build scoreboard content (left panel) — spectators excluded from rankings
   const renderScoreboard = () => {
     if (roomSettings.game_mode.startsWith('team_')) {
       const teams = {};
-      players.forEach(player => {
+      activePlayers.forEach(player => {
         if (player.team_number) {
           if (!teams[player.team_number]) {
             teams[player.team_number] = { teamNumber: player.team_number, totalScore: 0, members: [] };
@@ -577,19 +597,42 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
         </div>
       ));
     }
-    return players.sort((a, b) => b.score - a.score).map((player, idx) => {
-      const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
-      return (
-        <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}>
-          <span className="player-rank">#{idx + 1}</span>
-          <span className="player-name">
-            {player.is_bot && '🤖 '}{player.player_name}
-            {playerAnswered && <span className="answered-badge">✓</span>}
-          </span>
-          <span className="player-score">{player.score}</span>
-        </div>
-      );
-    });
+
+    return (
+      <>
+        {activePlayers.sort((a, b) => b.score - a.score).map((player, idx) => {
+          const playerAnswered = roundAnswers.some(a => a.player_id === player.id);
+          return (
+            <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}>
+              <span className="player-rank">#{idx + 1}</span>
+              <span className="player-name">
+                {player.is_bot && '🤖 '}{player.player_name}
+                {playerAnswered && <span className="answered-badge">✓</span>}
+              </span>
+              <span className="player-score">{player.score}</span>
+            </div>
+          );
+        })}
+        {spectators.length > 0 && (
+          <div style={{marginTop: 10, paddingTop: 8, borderTop: '1px solid #e5e7eb'}}>
+            <p style={{fontSize:'0.7rem',color:'#9ca3af',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.05em',margin:'0 0 6px 0'}}>
+              👁️ Spectators
+            </p>
+            {spectators.map(player => (
+              <div key={player.id} className={`player-score-item ${player.id === playerId ? 'current-player' : ''}`}
+                   style={{opacity: 0.7}}>
+                <span className="player-rank">👁️</span>
+                <span className="player-name">
+                  {player.player_name}
+                  {player.is_host && <FaCrown style={{marginLeft: 4, color: '#f59e0b', fontSize: '0.7rem'}} />}
+                </span>
+                <span className="player-score" style={{fontSize:'0.7rem',color:'#9ca3af'}}>spec</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    );
   };
 
   return (
@@ -664,24 +707,32 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
                 </div>
               </div>
 
-              {/* Word Input */}
-              <div className="game-input-zone">
-                <form onSubmit={handleSubmit} className="word-input-form">
-                  <input
-                    ref={wordInputRef}
-                    type="text"
-                    value={word}
-                    onChange={(e) => setWord(e.target.value)}
-                    placeholder="Type your word..."
-                    className="word-input"
-                    autoFocus
-                    disabled={hasAnswered}
-                  />
-                  <button type="submit" className="submit-btn" disabled={hasAnswered || !word.trim()}>
-                    {hasAnswered ? '✓ Answered' : 'Submit'}
-                  </button>
-                </form>
-              </div>
+              {/* Word Input — hidden for spectators */}
+              {isSpectator ? (
+                <div className="game-input-zone">
+                  <div style={{textAlign:'center',padding:'14px 18px',background:'#f3f4f6',borderRadius:10,color:'#6b7280',fontWeight:600,fontSize:'0.95rem'}}>
+                    👁️ You are spectating — watch the game!
+                  </div>
+                </div>
+              ) : (
+                <div className="game-input-zone">
+                  <form onSubmit={handleSubmit} className="word-input-form">
+                    <input
+                      ref={wordInputRef}
+                      type="text"
+                      value={word}
+                      onChange={(e) => setWord(e.target.value)}
+                      placeholder="Type your word..."
+                      className="word-input"
+                      autoFocus
+                      disabled={hasAnswered}
+                    />
+                    <button type="submit" className="submit-btn" disabled={hasAnswered || !word.trim()}>
+                      {hasAnswered ? '✓ Answered' : 'Submit'}
+                    </button>
+                  </form>
+                </div>
+              )}
 
               {/* Feedback */}
               {message && (

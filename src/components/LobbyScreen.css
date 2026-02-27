@@ -310,6 +310,55 @@
   transform: translateY(-2px);
 }
 
+/* Spectators Section */
+.spectators-section {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px dashed #d1d5db;
+}
+
+.spectators-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.spectators-header h4 {
+  flex: 1;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.spectators-count {
+  background: #e5e7eb;
+  color: #6b7280;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.player-card.spectator {
+  opacity: 0.8;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border: 1px dashed #d1d5db;
+}
+
+.spectator-badge {
+  background: #e5e7eb;
+  color: #6b7280;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* Waiting Area */
 .waiting-area {
   background: #f9fafb;
