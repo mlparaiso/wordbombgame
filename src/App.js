@@ -132,9 +132,9 @@ function App() {
       setScreen('gameOver');
       return;
     }
+    // Only update the combo here — timeLeft and timerKey were already reset
+    // immediately in submitWord so there's no lag on the timer bar.
     setCurrentCombo(getRandomCombo());
-    setTimeLeft(maxTimeRef.current);
-    setTimerKey(k => k + 1); // restart timer interval for new round
   }, [getRandomCombo]);
 
   // handleTimeout reads lives and maxTime from refs to avoid stale closures.
@@ -182,12 +182,17 @@ function App() {
     sounds.success();
     setScore(prev => prev + points);
     setUsedWords(prev => [...prev, trimmedWord]);
+
+    // Immediately stop the current timer and reset to full so there's no lag
+    setTimeLeft(maxTimeRef.current);
+    setTimerKey(k => k + 1);
+
     setRound(prev => {
       const nextRound = prev + 1;
-      // Schedule next round start with the new round value
+      // After brief celebration delay, update combo and round
       setTimeout(() => {
         startNewRound(nextRound);
-      }, 1000);
+      }, 800);
       return nextRound;
     });
 
