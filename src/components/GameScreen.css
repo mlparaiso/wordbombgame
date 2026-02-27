@@ -903,6 +903,26 @@
   animation: urgentPulse 0.5s ease-in-out infinite;
 }
 
+.header-room-code {
+  font-family: 'Bitter', Georgia, serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.13);
+  padding: 4px 10px;
+  border-radius: 8px;
+  letter-spacing: 0.06em;
+}
+
+.header-room-code strong {
+  font-family: 'Bitter', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.14em;
+}
+
 /* Solo header stats */
 .header-stats {
   display: flex;

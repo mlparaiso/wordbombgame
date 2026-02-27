@@ -455,6 +455,7 @@ export const getLeaderboard = async (roomCode) => {
     .select('*')
     .eq('room_code', roomCode.toUpperCase())
     .eq('is_active', true)
+    .eq('is_spectator', false)
     .order('score', { ascending: false });
   
   if (error) throw error;

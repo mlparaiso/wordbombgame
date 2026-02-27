@@ -48,6 +48,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const [showingResults, setShowingResults] = useState(false);
   const [initialCountdown, setInitialCountdown] = useState(10); // 10 second countdown before Round 1
   const [gameStarted, setGameStarted] = useState(false);
+  const [playersLoaded, setPlayersLoaded] = useState(false); // gate: don't start countdown until players are loaded
   const timerRef = useRef(null);
   const currentRoundRef = useRef(null);
   const wordInputRef = useRef(null);
@@ -66,7 +67,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       return;
     }
     setShowingResults(true);
-    setCountdown(5); // 5 second countdown for everyone
+    setCountdown(8); // 8 second countdown between rounds
   }, [gameState, roomSettings, isHost, roomCode]);
 
   // Keep the ref in sync with the latest handleRoundEnd
@@ -149,8 +150,12 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
         // Get players
         const playerList = await getPlayers(roomCode);
         setPlayers(playerList);
+        // Players are loaded — allow the pre-game countdown to start
+        setPlayersLoaded(true);
       } catch (error) {
         console.error('Error loading game data:', error);
+        // Even on error, unblock the countdown so the game doesn't get stuck
+        setPlayersLoaded(true);
       }
     };
 
@@ -292,12 +297,13 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
     return () => subscription.unsubscribe();
   }, [roomCode]);
 
-  // Initial countdown before Round 1
+  // Initial countdown before Round 1 — only starts once players are loaded
   useEffect(() => {
     if (!gameState) return;
     
     // Only show countdown for Round 1
     if (gameState.round_number === 1 && !gameStarted) {
+      if (!playersLoaded) return; // wait until player list is fetched
       if (initialCountdown > 0) {
         const timer = setTimeout(() => {
           setInitialCountdown(prev => prev - 1);
@@ -311,7 +317,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
       // For rounds after 1, game is already started
       setGameStarted(true);
     }
-  }, [gameState, initialCountdown, gameStarted]);
+  }, [gameState, initialCountdown, gameStarted, playersLoaded]);
 
   // Timer countdown - only restart when round actually changes
   useEffect(() => {
@@ -653,8 +659,8 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
           <span className="header-round-info">Round {gameState.round_number} / {roomSettings.max_rounds}</span>
           <span className={`header-timer ${isUrgent ? 'urgent' : ''}`}>⏱ {timeLeft.toFixed(1)}s</span>
         </div>
-        <span style={{ fontSize: '0.78rem', color: '#a5b4fc', fontWeight: 600, whiteSpace: 'nowrap' }}>
-          Room: {roomCode}
+        <span className="header-room-code">
+          Room: <strong>{roomCode}</strong>
         </span>
       </div>
 
