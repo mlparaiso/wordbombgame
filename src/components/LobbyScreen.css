@@ -380,6 +380,17 @@
   opacity: 0.8;
   background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
   border: 1px dashed #d1d5db;
+  min-width: 220px;
+  max-width: 320px;
+  flex-wrap: wrap;
+}
+
+.player-card.spectator .player-name {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  word-break: break-word;
+  min-width: 60px;
 }
 
 .spectator-badge {
