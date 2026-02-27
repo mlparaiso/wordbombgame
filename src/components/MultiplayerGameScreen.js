@@ -46,7 +46,7 @@ function MultiplayerGameScreen({ roomCode, playerId, isHost, onGameEnd }) {
   const [hasAnswered, setHasAnswered] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showingResults, setShowingResults] = useState(false);
-  const [initialCountdown, setInitialCountdown] = useState(5); // 5 second countdown before Round 1
+  const [initialCountdown, setInitialCountdown] = useState(10); // 10 second countdown before Round 1
   const [gameStarted, setGameStarted] = useState(false);
   const timerRef = useRef(null);
   const currentRoundRef = useRef(null);
