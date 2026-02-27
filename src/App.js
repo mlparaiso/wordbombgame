@@ -69,13 +69,10 @@ function App() {
   const recentCombosRef = React.useRef([]);
   const RECENT_COMBO_WINDOW = 10; // don't repeat a combo within the last 10 picks
 
-  // Refs to hold latest values so timer callback never captures stale closures
-  const livesRef = React.useRef(lives);
+  // Refs to hold latest values — avoid stale closures in timer callbacks
   const maxTimeRef = React.useRef(maxTime);
-  const isHandlingTimeoutRef = React.useRef(false); // prevent double-fire
+  const isHandlingTimeoutRef = React.useRef(false);
 
-  // Keep refs in sync
-  React.useEffect(() => { livesRef.current = lives; }, [lives]);
   React.useEffect(() => { maxTimeRef.current = maxTime; }, [maxTime]);
 
   const getRandomCombo = useCallback(() => {
@@ -313,23 +310,26 @@ function App() {
 
   // Note: Room status polling is now handled in LobbyScreen component
 
-  // Timer effect
+  // Timer effect — local variable `t` drives the countdown to avoid stale state issues
   useEffect(() => {
     if (!isPlaying || screen !== 'game') return;
 
+    // Seed from the current timeLeft value captured at effect-run time
+    let t = timeLeft > 0 ? timeLeft : maxTimeRef.current;
+
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        const newTime = prev - 0.1;
-        if (newTime <= 0) {
-          clearInterval(timer);
-          handleTimeout();
-          return 0;
-        }
-        return newTime;
-      });
+      t = parseFloat((t - 0.1).toFixed(2));
+      if (t < 0) t = 0;
+      setTimeLeft(t);
+
+      if (t <= 0) {
+        clearInterval(timer);
+        handleTimeout();
+      }
     }, 100);
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, screen, handleTimeout, timerKey]);
 
   return (
