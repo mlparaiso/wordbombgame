@@ -67,6 +67,15 @@ function App() {
   const recentCombosRef = React.useRef([]);
   const RECENT_COMBO_WINDOW = 10; // don't repeat a combo within the last 10 picks
 
+  // Refs to hold latest values so timer callback never captures stale closures
+  const livesRef = React.useRef(lives);
+  const maxTimeRef = React.useRef(maxTime);
+  const isHandlingTimeoutRef = React.useRef(false); // prevent double-fire
+
+  // Keep refs in sync
+  React.useEffect(() => { livesRef.current = lives; }, [lives]);
+  React.useEffect(() => { maxTimeRef.current = maxTime; }, [maxTime]);
+
   const getRandomCombo = useCallback(() => {
     const recent = recentCombosRef.current;
     // Filter out recently used combos so we don't repeat within the window
@@ -96,8 +105,9 @@ function App() {
         time = 10;
     }
 
-    // Reset recency window at the start of each game
+    // Reset recency window and timeout guard at the start of each game
     recentCombosRef.current = [];
+    isHandlingTimeoutRef.current = false;
 
     setDifficulty(selectedDifficulty);
     setScore(0);
@@ -123,23 +133,32 @@ function App() {
     setTimeLeft(maxTime);
   }, [getRandomCombo, maxTime]);
 
+  // handleTimeout reads lives and maxTime from refs to avoid stale closures.
+  // It is stable (no dep changes) so the timer useEffect only runs once per game start.
   const handleTimeout = useCallback(() => {
-    const newLives = lives - 1;
-    setLives(newLives);
+    // Guard: ignore if already handling a timeout (timer can fire multiple times at 0)
+    if (isHandlingTimeoutRef.current) return;
+    isHandlingTimeoutRef.current = true;
+
     sounds.timeout();
-    
-    if (newLives <= 0) {
-      setIsPlaying(false);
-      sounds.gameOver();
-      setScreen('gameOver');
-    } else {
-      // Timeout doesn't advance the round — same round count, new combo
-      setTimeout(() => {
-        setCurrentCombo(getRandomCombo());
-        setTimeLeft(maxTime);
-      }, 1500);
-    }
-  }, [lives, getRandomCombo, maxTime]);
+
+    setLives(prev => {
+      const newLives = prev - 1;
+      if (newLives <= 0) {
+        setIsPlaying(false);
+        sounds.gameOver();
+        setScreen('gameOver');
+      } else {
+        // Timeout doesn't advance the round — same round count, new combo
+        setTimeout(() => {
+          isHandlingTimeoutRef.current = false;
+          setCurrentCombo(getRandomCombo());
+          setTimeLeft(maxTimeRef.current);
+        }, 1500);
+      }
+      return newLives;
+    });
+  }, [getRandomCombo]); // stable — no lives/maxTime in deps
 
   const submitWord = useCallback(async (word) => {
     if (!isPlaying) return { success: false, message: '' };
