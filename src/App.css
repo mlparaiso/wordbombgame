@@ -72,6 +72,8 @@ main {
   align-items: stretch;
   justify-content: flex-start;
   flex: 1;
+  /* Allow children to stretch full height */
+  height: 90vh;
 }
 
 /* Hide scrollbar but allow scroll */

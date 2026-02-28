@@ -140,33 +140,34 @@ function GameScreen({
         <span className="solo-score-value">{score}</span>
       </div>
 
-      {/* ── Letter Combo ── */}
-      <div className="solo-combo-zone">
-        <p className="prompt-label">Find a word containing:</p>
-        <div className="letter-combo">{currentCombo}</div>
-      </div>
-
-      {/* ── Input ── */}
-      <div className="solo-input-zone">
-        <div className="input-container">
-          <input
-            ref={inputRef}
-            type="text"
-            className={shake ? 'shake' : ''}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your word here..."
-            autoComplete="off"
-            spellCheck="false"
-          />
-          <button onClick={handleSubmit}>
-            <FaPaperPlane /> Submit
-          </button>
+      {/* ── Center Zone: Letters + Input (vertically centered) ── */}
+      <div className="solo-center-zone">
+        <div className="solo-combo-zone">
+          <p className="prompt-label">Find a word containing:</p>
+          <div className="letter-combo">{currentCombo}</div>
         </div>
-        {/* Inline feedback below input */}
-        <div className={`feedback ${feedback.type}`} style={{marginTop: 6, marginBottom: 0}}>
-          {feedback.message}
+
+        <div className="solo-input-zone">
+          <div className="input-container">
+            <input
+              ref={inputRef}
+              type="text"
+              className={shake ? 'shake' : ''}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your word here..."
+              autoComplete="off"
+              spellCheck="false"
+            />
+            <button onClick={handleSubmit}>
+              <FaPaperPlane /> Submit
+            </button>
+          </div>
+          {/* Inline feedback below input */}
+          <div className={`feedback ${feedback.type}`} style={{marginTop: 6, marginBottom: 0}}>
+            {feedback.message}
+          </div>
         </div>
       </div>
 
